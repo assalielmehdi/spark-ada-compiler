@@ -1,0 +1,48 @@
+Proc {
+  'procedure' Idf 'is' List_decl 'begin' List_inst 'end' Idf ';'
+}
+
+List_decl {
+  Decl List_decl_aux
+}
+
+Decl {
+  Idf ':' Decl_aux
+}
+
+Decl_aux {
+  Type Decl_aux_aux
+  'constant' Type Decl_aux_aux
+}
+
+Decl_aux_aux {
+  ':=' Const,
+  ';'
+}
+
+List_decl_aux {
+  List_decl,
+  _epsilon
+}
+
+Type {
+  'Float',
+  'Integer',
+  'Character',
+  'Boolean',
+  'String',
+  'Positive',
+  'Natural'
+}
+
+Const {
+  Float_value,
+  Integer_value,
+  Character_value,
+  Boolean_value,
+  String_value
+}
+
+List_int {
+  _epsilon
+}
