@@ -1,31 +1,32 @@
-Proc {
+Proc [DONE] {
   'procedure' Idf 'is' List_decl 'begin' List_inst 'end' Idf ';'
 }
 
-List_decl {
+List_decl [DONE] {
   Decl List_decl_aux
 }
 
-Decl {
+Decl [DONE] {
   Idf ':' Decl_aux
 }
 
-Decl_aux {
+Decl_aux [DONE] {
   Type Decl_aux_aux
   'constant' Type Decl_aux_aux
 }
 
-Decl_aux_aux {
-  ':=' Const,
+Decl_aux_aux [DONE] {
+  ':=' Const ';',
   ';'
 }
 
-List_decl_aux {
+List_decl_aux [DONE] {
   List_decl,
-  _epsilon
+  _epsilon,
+  FOLLOW = {'begin'}
 }
 
-Type {
+Type [DONE] {
   'Float',
   'Integer',
   'Character',
@@ -35,7 +36,7 @@ Type {
   'Natural'
 }
 
-Const {
+Const [DONE] {
   Float_value,
   Integer_value,
   Character_value,
@@ -43,6 +44,7 @@ Const {
   String_value
 }
 
-List_int {
-  _epsilon
+List_inst [DONE] {
+  _epsilon,
+  FOLLOW = {'end'}
 }

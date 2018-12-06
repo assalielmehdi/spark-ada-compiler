@@ -2,6 +2,8 @@
 #define SYNTACTICAL_ANALYZER
 
 #include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
 typedef enum {
   KEY_WORD_ABORT,
@@ -104,14 +106,36 @@ typedef enum {
   DELIMITER_NOT_EQUAL,
   COMMENT,
   IDENTIFIER,
-  NUMERIC_LITERAL,
   CHARACTER_LITERAL,
   STRING_LITERAL,
-  NUMBER,
   BOOLEAN_TRUE_VALUE,
   BOOLEAN_FALSE_VALUE,
   INTEGER_VALUE,
   FLOAT_VALUE
 } _token_type;
+
+extern int yylex();
+
+extern char *yytext;
+
+void _read_token();
+
+bool _proc();
+
+bool _list_decl();
+
+bool _decl();
+
+bool _decl_aux();
+
+bool _decl_aux_aux();
+
+bool _list_decl_aux();
+
+bool _type();
+
+bool _const();
+
+bool _list_inst();
 
 #endif
