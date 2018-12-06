@@ -28,18 +28,21 @@ bool _proc() {
     _read_token();
     if (token == IDENTIFIER) {
       _read_token();
-      if (_list_decl()) {
+      if (token == KEY_WORD_IS) {
         _read_token();
-        if (token == KEY_WORD_BEGIN) {
+        if (_list_decl()) {
           _read_token();
-          if (_list_inst()) {
+          if (token == KEY_WORD_BEGIN) {
             _read_token();
-            if (token == KEY_WORD_END) {
+            if (_list_inst()) {
               _read_token();
-              if (token == IDENTIFIER) {
+              if (token == KEY_WORD_END) {
                 _read_token();
-                if (token == DELIMITER_SEMICOLON) {
-                  result = true;
+                if (token == IDENTIFIER) {
+                  _read_token();
+                  if (token == DELIMITER_SEMICOLON) {
+                    result = true;
+                  }
                 }
               }
             }
@@ -83,7 +86,7 @@ bool _decl_aux() {
     if (_decl_aux_aux()) {
       result = true;
     }
-  } else if (token == IDENTIFIER && !strcmp(yytext, "constant")) {
+  } else if (token == KEY_WORD_CONSTANT) {
     _read_token();
     if (_type()) {
       _read_token();
@@ -100,7 +103,10 @@ bool _decl_aux_aux() {
   if (token == DELIMITER_ASSIGN) {
     _read_token();
     if (_const()) {
-      result = true;
+      _read_token();
+      if (token == DELIMITER_SEMICOLON) { 
+        result = true;
+      }
     }
   } else if (token == DELIMITER_SEMICOLON) {
     result = true;
