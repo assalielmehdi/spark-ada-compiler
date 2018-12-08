@@ -104,7 +104,7 @@ bool _decl_aux_aux() {
     _read_token();
     if (_const()) {
       _read_token();
-      if (token == DELIMITER_SEMICOLON) { 
+      if (token == DELIMITER_SEMICOLON) {
         result = true;
       }
     }
@@ -127,9 +127,9 @@ bool _list_decl_aux() {
 bool _type() {
   bool result = false;
   if (token == IDENTIFIER && !(
-      strcmp(yytext, "Integer") * strcmp(yytext, "Float")  * 
-      strcmp(yytext, "Boolean") * strcmp(yytext, "Character") * 
-      strcmp(yytext, "Natural") * strcmp(yytext, "Positive") * 
+      strcmp(yytext, "Integer") * strcmp(yytext, "Float")  *
+      strcmp(yytext, "Boolean") * strcmp(yytext, "Character") *
+      strcmp(yytext, "Natural") * strcmp(yytext, "Positive") *
       strcmp(yytext, "String"))
   ) {
     result = true;
@@ -156,6 +156,80 @@ bool _list_inst() {
   bool result = false;
   if (token == KEY_WORD_END) {
     result = follow = true;
+  }
+  return result;
+}
+
+// sorry for spliting the methods but I hate the Script to be long
+bool _if_statement(){
+  bool result = false;
+  if (token == KEY_WORD_IF){
+    _read_token();
+    if (_expression()/*we need to add this function too ,I think it'
+    all the operations and other shit, we will talk about it later  */) {
+      _read_token();
+      if (token == KEY_WORD_THEN) {
+        _read_token();
+        if (_expression()){
+          _read_token();
+          if (token == KEY_WORD_END) {
+            _read_token();
+            if (token == KEY_WORD_IF) {
+              result = true;
+            }
+          }else if (_elsif_statement()) {
+            result = true;
+          }else if (_else_statemnet()) {
+            result = true;
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
+
+bool _else_statement(){
+  result = false;
+  if (token == KEY_WORD_ELSE){
+    _read_token();
+    if (_expression()) {
+      _read_token();
+      if (token == KEY_WORD_END) {
+        _read_token();
+        if (token == KEY_WORD_IF) {
+          result = true;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+bool _elsif_statement(){
+  bool result = false;
+  if (token == KEY_WORD_ELSIF ){
+    _read_token();
+    if (_expression()) {
+      _read_token();
+      if (token == KEY_WORD_THEN) {
+        _read_token();
+        if (_expression()) {
+          _read_token();
+          if (token == KEY_WORD_END) {
+            _read_token();
+            if (token == KEY_WORD_IF) {
+              result = true;
+            }
+          }else if (_elsif_statemnet()){
+            result == true;
+          }else if (_else_statement()) /*add _else_statemnet here**/{
+            result = true;
+          }
+        }
+      }
+    }
   }
   return result;
 }
