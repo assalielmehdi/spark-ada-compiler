@@ -1,12 +1,12 @@
 # A sample Spark 2014 compiler
 
 ### Authors:
-  [Anass BAIROUK](https://www.linkedin.com/in/anass-bairouk-258673109/)
-  [Widad BOUJAAFAR](https://www.linkedin.com/in/widad-boujaafar-a9829415b/)
-  [El Mehdi ASSALI](https://www.linkedin.com/in/assalielmehdi/)
+⋅⋅⋅[Anass BAIROUK](https://www.linkedin.com/in/anass-bairouk-258673109/)
+⋅⋅⋅[Widad BOUJAAFAR](https://www.linkedin.com/in/widad-boujaafar-a9829415b/)
+⋅⋅⋅[El Mehdi ASSALI](https://www.linkedin.com/in/assalielmehdi/)
 
 ### Supervised by:
-  [Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
+⋅⋅⋅[Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
 
 ### Some convention to follow by team members:
 1. Prefix all functions and variables with an underscore.
