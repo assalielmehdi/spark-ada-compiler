@@ -8,7 +8,7 @@
 ### Supervised by: 
 - [Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
 
-### Some convention to follow by team members:
+### Some conventions to follow by team members:
 1. Prefix all functions and variables with an underscore.
 2. Before implementing a grammatical function, add it's prototype to the corresponding .h file and add it's definition to grammar.txt file.
 3. Before marking a task done, please test it with multiple examples.
