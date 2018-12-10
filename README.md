@@ -5,7 +5,8 @@
 - [Widad BOUJAAFAR](https://www.linkedin.com/in/widad-boujaafar-a9829415b/)
 - [El Mehdi ASSALI](https://www.linkedin.com/in/assalielmehdi/)
 
-### Supervised by: [Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
+### Supervised by: 
+- [Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
 
 ### Some convention to follow by team members:
 1. Prefix all functions and variables with an underscore.
