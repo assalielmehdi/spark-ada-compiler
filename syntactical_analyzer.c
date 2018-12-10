@@ -160,17 +160,21 @@ bool _list_inst() {
   return result;
 }
 
-// sorry for spliting the methods but I hate the Script to be long
-bool _if_statement(){
+// TODO: Implementation
+bool _expression() {
   bool result = false;
-  if (token == KEY_WORD_IF){
+  return result;
+}
+
+bool _if_statement() {
+  bool result = false;
+  if (token == KEY_WORD_IF) {
     _read_token();
-    if (_expression()/*we need to add this function too ,I think it'
-    all the operations and other shit, we will talk about it later  */) {
+    if (_expression()) {
       _read_token();
       if (token == KEY_WORD_THEN) {
         _read_token();
-        if (_expression()){
+        if (_expression()) {
           _read_token();
           if (token == KEY_WORD_END) {
             _read_token();
@@ -179,7 +183,7 @@ bool _if_statement(){
             }
           }else if (_elsif_statement()) {
             result = true;
-          }else if (_else_statemnet()) {
+          }else if (_else_statement()) {
             result = true;
           }
         }
@@ -189,10 +193,9 @@ bool _if_statement(){
   return result;
 }
 
-
-bool _else_statement(){
-  result = false;
-  if (token == KEY_WORD_ELSE){
+bool _else_statement() {
+  bool result = false;
+  if (token == KEY_WORD_ELSE) {
     _read_token();
     if (_expression()) {
       _read_token();
@@ -209,7 +212,7 @@ bool _else_statement(){
 
 bool _elsif_statement(){
   bool result = false;
-  if (token == KEY_WORD_ELSIF ){
+  if (token == KEY_WORD_ELSIF) {
     _read_token();
     if (_expression()) {
       _read_token();
@@ -222,9 +225,9 @@ bool _elsif_statement(){
             if (token == KEY_WORD_IF) {
               result = true;
             }
-          }else if (_elsif_statemnet()){
-            result == true;
-          }else if (_else_statement()) /*add _else_statemnet here**/{
+          } else if (_elsif_statement()) {
+            result = true;
+          } else if (_else_statement()) {
             result = true;
           }
         }
