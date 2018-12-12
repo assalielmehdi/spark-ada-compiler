@@ -46,5 +46,35 @@ Const [DONE] {
 
 List_inst [DONE] {
   _epsilon,
-  FOLLOW = {'end'}
+  FOLLOW = {'end', ''}
+}
+
+If_statement [DONE] {
+  'if' Expression 'then' List_inst Elsif_statement
+}
+
+Elsif_statement [DONE] {
+  'elsif' Expression 'then' List_inst Elsif_statement,
+  'else' List_inst Endif_statement,
+  Endif_statement
+}
+
+Endif_statement [DONE] {
+  'end' 'if' ';'
+}
+
+Expression [DONE] {
+  Relation Expression_aux
+}
+
+Expression_aux [DONE] {
+  'and' Relation,
+  'xor' Relation,
+  'or' Relation,
+  _epsilon,
+  FOLLOW = {'then'}
+}
+
+Relation {
+
 }
