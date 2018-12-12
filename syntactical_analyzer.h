@@ -156,4 +156,14 @@ bool _relation_aux();
 
 bool _simple_expression();
 
+bool _simple_expression_aux();
+
+bool _term();
+
+bool _term_aux();
+
+bool _factor();
+
+bool _primary();
+
 #endif

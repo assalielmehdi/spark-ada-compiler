@@ -240,6 +240,7 @@ bool _endif_statement() {
 }
 
 bool _expression() {
+  printf("_expression() : %s\n", yytext);
   bool result = false;
   if (_relation()) {
     _read_token();
@@ -251,6 +252,7 @@ bool _expression() {
 }
 
 bool _expression_aux() {
+  printf("_expression_aux() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_AND) {
     _read_token();
@@ -267,13 +269,14 @@ bool _expression_aux() {
     if (_relation()) {
       result = true;
     }
-  } else if (token == KEY_WORD_THEN) {
+  } else if (token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED) {
     result = follow = true;
   }
   return result;
 }
 
 bool _relation() {
+  printf("_relation() : %s\n", yytext);
   bool result = false;
   if (_simple_expression()) {
     _read_token();
@@ -285,6 +288,7 @@ bool _relation() {
 }
 
 bool _relation_aux() {
+  printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_EQUAL) {
     _read_token();
@@ -316,13 +320,169 @@ bool _relation_aux() {
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR) {
+  } else if (
+    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || 
+    token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED
+  ) {
     result = follow = true;
   }
   return result;
 }
 
 bool _simple_expression() {
+  printf("_simple_expression() : %s\n", yytext);
   bool result = false;
+  if (token == DELIMITER_PLUS) {
+    _read_token();
+    if (_term()) {
+      _read_token();
+      if (_simple_expression_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == DELIMITER_DASH) {
+    _read_token();
+    if (_term()) {
+      _read_token();
+      if (_simple_expression_aux()) {
+        result = true;
+      }
+    }
+  } else if (_term()) {
+    _read_token();
+    if (_simple_expression_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _simple_expression_aux() {
+  printf("_simple_expression_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_PLUS) {
+    _read_token();
+    if (_term()) {
+      _read_token();
+      if (_simple_expression_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == DELIMITER_DASH) {
+    _read_token();
+    if (_term()) {
+      _read_token();
+      if (_simple_expression_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == DELIMITER_AND) {
+    _read_token();
+    if (_term()) {
+      _read_token();
+      if (_simple_expression_aux()) {
+        result = true;
+      }
+    }
+  } else if (
+    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
+    token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
+    token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || 
+    token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED
+  ) {
+    result = follow = true;
+  }
+  return result;
+}
+
+bool _term() {
+  printf("_term() : %s\n", yytext);
+  bool result = false;
+  if (_factor()) {
+    _read_token();
+    if (_term_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _term_aux() {
+  printf("_term_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_STAR) {
+    _read_token();
+    if (_factor()) {
+      _read_token();
+      if (_term_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == DELIMITER_SLASH) {
+    _read_token();
+    if (_factor()) {
+      _read_token();
+      if (_term_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == KEY_WORD_MOD) {
+    _read_token();
+    if (_factor()) {
+      _read_token();
+      if (_term_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == KEY_WORD_REM) {
+    _read_token();
+    if (_factor()) {
+      _read_token();
+      if (_term_aux()) {
+        result = true;
+      }
+    }
+  } else if (
+    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
+    token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
+    token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || token == DELIMITER_GREATER_THAN_EQUAL ||
+    token == DELIMITER_PLUS || token == DELIMITER_DASH || token == DELIMITER_AND || token == DELIMITER_PAR_CLOSED
+  ) {
+    result = follow = true;
+  }
+  return result;
+}
+
+bool _factor() {
+  printf("_factor() : %s\n", yytext);
+  bool result = false;
+  if (_primary()) {
+    result = true;
+  }
+  return result;
+}
+
+bool _primary() {
+  printf("_primary() : %s\n", yytext);
+  bool result = false;
+  if (token == INTEGER_VALUE) {
+    result = true;
+  } else if (token == FLOAT_VALUE) {
+    result = true;
+  } else if (token == KEY_WORD_NULL) {
+    result = true;
+  } else if (token == STRING_LITERAL) {
+    result = true;
+  } else if (token == IDENTIFIER) {
+    result = true;
+  } else if (token == DELIMITER_PAR_OPENED) {
+    _read_token();
+    if (_expression()) {
+      _read_token();
+      if (DELIMITER_PAR_CLOSED) {
+        result = true;
+      }
+    }
+  }
   return result;
 }

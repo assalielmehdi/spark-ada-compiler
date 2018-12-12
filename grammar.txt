@@ -79,7 +79,7 @@ Expression_aux [DONE] {
   'xor' Relation,
   'or' Relation,
   _epsilon,
-  FOLLOW = {'then'}
+  FOLLOW = {'then', ')'}
 }
 
 Relation [DONE] {
@@ -94,9 +94,45 @@ Relation_aux [UNCOMPLETED] {
   '>' Simple_expression,
   '>=' Simple_expression,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or'}
+  FOLLOW = {'then', 'and', 'xor', 'or', ')'}
 }
 
-Simple_expression [UNCOMPLETED] {
-  
+Simple_expression [DONE] {
+  '+' Term Simple_expression_aux,
+  '-' Term Simple_expression_aux,
+  Term Simple_expression_aux,
+}
+
+Simple_expression_aux [DONE] {
+  '+' Term Simple_expression_aux,
+  '-' Term Simple_expression_aux,
+  '&' Term Simple_expression_aux,
+  _epsilon,
+  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')'}
+}
+
+Term [DONE] {
+  Factor Term_aux
+}
+
+Term_aux [DONE] {
+  '*' Factor Term_aux,
+  '/' Factor Term_aux,
+  'mod' Factor Term_aux,
+  'rem' Factor Term_aux,
+  _epsilon,
+  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')'}
+}
+
+Factor [UNCOMPLETED] {
+  Primary
+}
+
+Primary [UNCOMPLETED] {
+  Idf,
+  'null',
+  String_literal,
+  Integer_value,
+  Float_value,
+  '(' Expression ')'
 }

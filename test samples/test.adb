@@ -23,7 +23,7 @@ test3:Boolean;
 
 begin
 
-if relation then
+if (test2) then
 else
 end if;
 
