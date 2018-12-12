@@ -275,8 +275,54 @@ bool _expression_aux() {
 
 bool _relation() {
   bool result = false;
-  if (token == IDENTIFIER && !strcmp(yytext, "relation")) {
-    result = true;
+  if (_simple_expression()) {
+    _read_token();
+    if (_relation_aux()) {
+      result = true;
+    }
   }
+  return result;
+}
+
+bool _relation_aux() {
+  bool result = false;
+  if (token == DELIMITER_EQUAL) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == DELIMITER_DIVIDE_EQUAL) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == DELIMITER_LESS_THAN) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == DELIMITER_LESS_THAN_EQUAL) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == DELIMITER_GREATER_THAN) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == DELIMITER_GREATER_THAN_EQUAL) {
+    _read_token();
+    if (_simple_expression()) {
+      result = true;
+    }
+  } else if (token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR) {
+    result = follow = true;
+  }
+  return result;
+}
+
+bool _simple_expression() {
+  bool result = false;
   return result;
 }

@@ -82,6 +82,21 @@ Expression_aux [DONE] {
   FOLLOW = {'then'}
 }
 
-Relation [UNCOMPLETED] {
-  'relation'
+Relation [DONE] {
+  Simple_expression Relation_aux
+}
+
+Relation_aux [UNCOMPLETED] {
+  '=' Simple_expression,
+  '/=' Simple_expression,
+  '<' Simple_expression,
+  '<=' Simple_expression,
+  '>' Simple_expression,
+  '>=' Simple_expression,
+  _epsilon,
+  FOLLOW = {'then', 'and', 'xor', 'or'}
+}
+
+Simple_expression [UNCOMPLETED] {
+  
 }

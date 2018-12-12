@@ -152,4 +152,8 @@ bool _expression_aux();
 
 bool _relation();
 
+bool _relation_aux();
+
+bool _simple_expression();
+
 #endif
