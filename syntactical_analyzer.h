@@ -138,12 +138,18 @@ bool _const();
 
 bool _list_inst();
 
-bool _expression();
+bool _list_inst_aux();
 
 bool _if_statement();
 
-bool _else_statement();
-
 bool _elsif_statement();
+
+bool _endif_statement();
+
+bool _expression();
+
+bool _expression_aux();
+
+bool _relation();
 
 #endif

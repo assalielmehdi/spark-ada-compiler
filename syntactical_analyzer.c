@@ -154,15 +154,24 @@ bool _const() {
 
 bool _list_inst() {
   bool result = false;
-  if (token == KEY_WORD_END) {
+  if (_if_statement()) {
+    _read_token();
+    if (_list_inst_aux()) {
+      result = true;
+    } 
+  } else if (token == KEY_WORD_END || token == KEY_WORD_ELSIF || token == KEY_WORD_ELSE) {
     result = follow = true;
   }
   return result;
 }
 
-// TODO: Implementation
-bool _expression() {
+bool _list_inst_aux() {
   bool result = false;
+  if (_list_inst()) {
+    result = true;
+  } else if (token == KEY_WORD_END || token == KEY_WORD_ELSIF || token == KEY_WORD_ELSE) {
+    result = follow = true;
+  }
   return result;
 }
 
@@ -174,16 +183,9 @@ bool _if_statement() {
       _read_token();
       if (token == KEY_WORD_THEN) {
         _read_token();
-        if (_expression()) {
+        if (_list_inst()) {
           _read_token();
-          if (token == KEY_WORD_END) {
-            _read_token();
-            if (token == KEY_WORD_IF) {
-              result = true;
-            }
-          }else if (_elsif_statement()) {
-            result = true;
-          }else if (_else_statement()) {
+          if (_elsif_statement()) {
             result = true;
           }
         }
@@ -193,24 +195,7 @@ bool _if_statement() {
   return result;
 }
 
-bool _else_statement() {
-  bool result = false;
-  if (token == KEY_WORD_ELSE) {
-    _read_token();
-    if (_expression()) {
-      _read_token();
-      if (token == KEY_WORD_END) {
-        _read_token();
-        if (token == KEY_WORD_IF) {
-          result = true;
-        }
-      }
-    }
-  }
-  return result;
-}
-
-bool _elsif_statement(){
+bool _elsif_statement() {
   bool result = false;
   if (token == KEY_WORD_ELSIF) {
     _read_token();
@@ -218,21 +203,80 @@ bool _elsif_statement(){
       _read_token();
       if (token == KEY_WORD_THEN) {
         _read_token();
-        if (_expression()) {
+        if (_list_inst()) {
           _read_token();
-          if (token == KEY_WORD_END) {
-            _read_token();
-            if (token == KEY_WORD_IF) {
-              result = true;
-            }
-          } else if (_elsif_statement()) {
-            result = true;
-          } else if (_else_statement()) {
+          if (_elsif_statement()) {
             result = true;
           }
         }
       }
     }
+  } else if (token == KEY_WORD_ELSE) {
+    _read_token();
+    if (_list_inst()) {
+      _read_token();
+      if (_endif_statement()) {
+        result = true;
+      }
+    }
+  } else if (_endif_statement()) {
+    result = true;
+  }
+  return result;
+}
+
+bool _endif_statement() {
+  bool result = false;
+  if (token == KEY_WORD_END) {
+    _read_token();
+    if (token == KEY_WORD_IF) {
+      _read_token();
+      if (token == DELIMITER_SEMICOLON) {
+        result = true;
+      }
+    }
+  }
+  return result;
+}
+
+bool _expression() {
+  bool result = false;
+  if (_relation()) {
+    _read_token();
+    if (_expression_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _expression_aux() {
+  bool result = false;
+  if (token == KEY_WORD_AND) {
+    _read_token();
+    if (_relation()) {
+      result = true;
+    }
+  } else if (token == KEY_WORD_XOR) {
+    _read_token();
+    if (_relation()) {
+      result = true;
+    }
+  } else if (token == KEY_WORD_OR) {
+    _read_token();
+    if (_relation()) {
+      result = true;
+    }
+  } else if (token == KEY_WORD_THEN) {
+    result = follow = true;
+  }
+  return result;
+}
+
+bool _relation() {
+  bool result = false;
+  if (token == IDENTIFIER && !strcmp(yytext, "relation")) {
+    result = true;
   }
   return result;
 }

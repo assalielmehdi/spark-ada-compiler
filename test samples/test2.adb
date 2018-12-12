@@ -22,5 +22,19 @@ test3:Boolean;
 test3:Boolean;
 
 begin
-end test;
 
+if relation then
+else
+end if;
+
+if relation and relation then
+elsif relation then
+end if;
+
+if relation xor relation then
+elsif relation or relation then
+elsif relation and relation then
+else
+end if;
+
+end test;

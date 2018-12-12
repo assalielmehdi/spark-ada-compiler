@@ -44,9 +44,16 @@ Const [DONE] {
   String_value
 }
 
-List_inst [DONE] {
+List_inst [UNCOMPLETED] {
+  If_statement List_inst_aux,
   _epsilon,
-  FOLLOW = {'end', ''}
+  FOLLOW = {'end', 'elsif', 'else'}
+}
+
+List_inst_aux [UNCOMPLETED] {
+  List_inst,
+  _epsilon,
+  FOLLOW = {'end', 'elsif', 'else'}
 }
 
 If_statement [DONE] {
@@ -75,6 +82,6 @@ Expression_aux [DONE] {
   FOLLOW = {'then'}
 }
 
-Relation {
-
+Relation [UNCOMPLETED] {
+  'relation'
 }
