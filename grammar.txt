@@ -46,14 +46,15 @@ Const [DONE] {
 
 List_inst [UNCOMPLETED] {
   If_statement List_inst_aux,
+  Case_statement List_inst_aux,
   _epsilon,
-  FOLLOW = {'end', 'elsif', 'else'}
+  FOLLOW = {'end', 'elsif', 'else', 'when'}
 }
 
 List_inst_aux [UNCOMPLETED] {
   List_inst,
   _epsilon,
-  FOLLOW = {'end', 'elsif', 'else'}
+  FOLLOW = {'end', 'elsif', 'else', 'when'}
 }
 
 If_statement [DONE] {
@@ -79,7 +80,7 @@ Expression_aux [DONE] {
   'xor' Relation,
   'or' Relation,
   _epsilon,
-  FOLLOW = {'then', ')'}
+  FOLLOW = {'then', ')', '=>', 'is', '|'}
 }
 
 Relation [DONE] {
@@ -94,7 +95,7 @@ Relation_aux [UNCOMPLETED] {
   '>' Simple_expression,
   '>=' Simple_expression,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', ')'}
+  FOLLOW = {'then', 'and', 'xor', 'or', ')', '=>', 'is', '|'}
 }
 
 Simple_expression [DONE] {
@@ -108,7 +109,7 @@ Simple_expression_aux [DONE] {
   '-' Term Simple_expression_aux,
   '&' Term Simple_expression_aux,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')'}
+  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')', '=>', 'is', '|'}
 }
 
 Term [DONE] {
@@ -135,4 +136,32 @@ Primary [UNCOMPLETED] {
   Integer_value,
   Float_value,
   '(' Expression ')'
+}
+
+Case_statement [DONE] {
+  "case" Expression "is" Case_statement_alternative Case_statement_aux
+}
+
+Case_statement_aux [DONE] {
+  Case_statement_alternative Case_statement_aux,
+  'end' 'case' ';'
+}
+
+Case_statement_alternative [DONE] {
+  'when' Choice_list '=>' List_inst
+}
+
+Choice_list [DONE] {
+  Choise Choice_list_aux
+}
+
+Choice_list_aux [DONE] {
+  '|' Choise Choice_list_aux,
+  _epsilon,
+  FOLLOW = {'=>'}
+}
+
+Choise [UNCOMPLETED] {
+  "others",
+  Expression
 }

@@ -79,6 +79,7 @@ typedef enum {
   KEY_WORD_MOD,
   KEY_WORD_REQUEUE,
   KEY_WORD_XOR,
+  DELIMITER_PIPE,
   DELIMITER_AND,
   DELIMITER_QUOTE,
   DELIMITER_PAR_OPENED,
@@ -165,5 +166,17 @@ bool _term_aux();
 bool _factor();
 
 bool _primary();
+
+bool _case_statement();
+
+bool _case_statement_aux();
+
+bool _case_statement_alternative();
+
+bool _choice_list();
+
+bool _choice_list_aux();
+
+bool _choice();
 
 #endif

@@ -159,7 +159,15 @@ bool _list_inst() {
     if (_list_inst_aux()) {
       result = true;
     } 
-  } else if (token == KEY_WORD_END || token == KEY_WORD_ELSIF || token == KEY_WORD_ELSE) {
+  } else if (_case_statement()) {
+    _read_token();
+    if (_list_inst_aux()) {
+      result = true;
+    } 
+  } else if (
+    token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
+    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
+  ) {
     result = follow = true;
   }
   return result;
@@ -169,7 +177,10 @@ bool _list_inst_aux() {
   bool result = false;
   if (_list_inst()) {
     result = true;
-  } else if (token == KEY_WORD_END || token == KEY_WORD_ELSIF || token == KEY_WORD_ELSE) {
+  } else if (
+    token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
+    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
+  ) {
     result = follow = true;
   }
   return result;
@@ -269,7 +280,10 @@ bool _expression_aux() {
     if (_relation()) {
       result = true;
     }
-  } else if (token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED) {
+  } else if (
+    token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED ||
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
+  ) {
     result = follow = true;
   }
   return result;
@@ -322,7 +336,8 @@ bool _relation_aux() {
     }
   } else if (
     token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || 
-    token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED
+    token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED ||
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
   ) {
     result = follow = true;
   }
@@ -388,7 +403,8 @@ bool _simple_expression_aux() {
     token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
     token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
     token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || 
-    token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED
+    token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED ||
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
   ) {
     result = follow = true;
   }
@@ -446,7 +462,8 @@ bool _term_aux() {
     token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
     token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
     token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || token == DELIMITER_GREATER_THAN_EQUAL ||
-    token == DELIMITER_PLUS || token == DELIMITER_DASH || token == DELIMITER_AND || token == DELIMITER_PAR_CLOSED
+    token == DELIMITER_PLUS || token == DELIMITER_DASH || token == DELIMITER_AND || token == DELIMITER_PAR_CLOSED ||
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
   ) {
     result = follow = true;
   }
@@ -483,6 +500,105 @@ bool _primary() {
         result = true;
       }
     }
+  }
+  return result;
+}
+
+bool _case_statement() {
+  printf("_case_statement() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_CASE) {
+    _read_token();
+    if (_expression()) {
+      _read_token();
+      if (token == KEY_WORD_IS) {
+        _read_token();
+        if (_case_statement_alternative()) {
+          _read_token();
+          if (_case_statement_aux()) {
+            result = true;
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
+bool _case_statement_aux() {
+  printf("_case_statement_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_END) {
+    _read_token();
+    if (token == KEY_WORD_CASE) {
+      _read_token();
+      if (token == DELIMITER_SEMICOLON) {
+        result = true;
+      }
+    }
+  } else if (_case_statement_alternative()) {
+    _read_token();
+    if (_case_statement_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _case_statement_alternative() {
+  printf("_case_statement_alternative() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_WHEN) {
+    _read_token();
+    if (_choice_list()) {
+      _read_token();
+      if (token == DELIMITER_FAT_ARROW) {
+        _read_token();
+        if (_list_inst()) {
+          result = true;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+bool _choice_list() {
+  printf("_choice_list() : %s\n", yytext);
+  bool result = false;
+  if (_choice()) {
+    _read_token();
+    if (_choice_list_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _choice_list_aux() {
+  printf("_choice_list_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_PIPE) {
+    _read_token();
+    if (_choice()) {
+      _read_token();
+      if (_choice_list_aux()) {
+        result = true;
+      }
+    }
+  } else if (token == DELIMITER_FAT_ARROW) {
+    result = follow = true;
+  }
+  return result;
+}
+
+bool _choice() {
+  printf("_choice() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_OTHERS) {
+    result = true;
+  } else if (_expression()) {
+    result = true;
   }
   return result;
 }

@@ -89,6 +89,7 @@ CHARACTER  [A-Za-z]
 "mod" return KEY_WORD_MOD;
 "requeue" return KEY_WORD_REQUEUE;
 "xor" return KEY_WORD_XOR;
+"|" return DELIMITER_PIPE;
 "&" return DELIMITER_AND;
 "'" return DELIMITER_QUOTE;
 "(" return DELIMITER_PAR_OPENED;
