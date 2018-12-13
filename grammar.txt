@@ -55,7 +55,7 @@ List_inst [UNCOMPLETED] {
 List_inst_aux [UNCOMPLETED] {
   List_inst,
   _epsilon,
-  FOLLOW = {'end', 'elsif', 'else', 'when',';'}
+  FOLLOW = {'end', 'elsif', 'else', 'when'}
 }
 
 If_statement [DONE] {
@@ -167,6 +167,6 @@ Choise [UNCOMPLETED] {
   Expression
 }
 
-Sample_inst {
+Sample_inst [DONE] {
   Idf ':=' Expression ';'
 }
