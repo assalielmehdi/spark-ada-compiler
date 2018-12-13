@@ -81,7 +81,7 @@ Expression_aux [DONE] {
   'xor' Relation,
   'or' Relation,
   _epsilon,
-  FOLLOW = {'then', ')', '=>', 'is', '|',';'}
+  FOLLOW = {'then', ')', '=>', 'is', '|', ';'}
 }
 
 Relation [DONE] {
@@ -96,7 +96,7 @@ Relation_aux [UNCOMPLETED] {
   '>' Simple_expression,
   '>=' Simple_expression,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', ')', '=>', 'is', '|',';'}
+  FOLLOW = {'then', 'and', 'xor', 'or', ')', '=>', 'is', '|', ';'}
 }
 
 Simple_expression [DONE] {
@@ -110,7 +110,7 @@ Simple_expression_aux [DONE] {
   '-' Term Simple_expression_aux,
   '&' Term Simple_expression_aux,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')', '=>', 'is', '|',';'}
+  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')', '=>', 'is', '|', ';'}
 }
 
 Term [DONE] {
@@ -123,7 +123,7 @@ Term_aux [DONE] {
   'mod' Factor Term_aux,
   'rem' Factor Term_aux,
   _epsilon,
-  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')', '=>', 'is', '|',';'}
+  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')', '=>', 'is', '|', ';'}
 }
 
 Factor [UNCOMPLETED] {
@@ -169,4 +169,23 @@ Choise [UNCOMPLETED] {
 
 Sample_inst [DONE] {
   Idf ':=' Expression ';'
+}
+
+Loop_statement [DONE] {
+  Idf ':' Loop_statement_aux,
+  Loop_statement_aux
+}
+
+Loop_statement_aux [UNCOMPLETED] {
+  'while' Expression Loop_statement_aux_aux,
+  Loop_statement_aux_aux
+}
+
+Loop_statement_aux_aux [DONE] {
+  'loop' List_inst 'end' 'loop' Loop_statement_aux_aux_aux
+}
+
+Loop_statement_aux_aux_aux [DONE] {
+  Idf ';',
+  ';'
 }
