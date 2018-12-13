@@ -122,7 +122,7 @@ Term_aux [DONE] {
   'mod' Factor Term_aux,
   'rem' Factor Term_aux,
   _epsilon,
-  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')'}
+  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')', '=>', 'is', '|'}
 }
 
 Factor [UNCOMPLETED] {
