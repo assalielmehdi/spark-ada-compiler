@@ -164,7 +164,13 @@ bool _list_inst() {
     if (_list_inst_aux()) {
       result = true;
     } 
-  } else if (
+  } else if(_sample_inst()){
+    _read_token();
+    if(_list_inst_aux()){
+      result = true;
+    }
+  }
+  else if (
     token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
     token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
   ) {
@@ -179,7 +185,8 @@ bool _list_inst_aux() {
     result = true;
   } else if (
     token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
-    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
+    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN ||
+    token == DELIMITER_SEMICOLON
   ) {
     result = follow = true;
   }
@@ -283,6 +290,7 @@ bool _expression_aux() {
   } else if (
     token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED ||
     token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
+    || token == DELIMITER_SEMICOLON
   ) {
     result = follow = true;
   }
@@ -338,6 +346,7 @@ bool _relation_aux() {
     token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || 
     token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED ||
     token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
+    || token == DELIMITER_SEMICOLON
   ) {
     result = follow = true;
   }
@@ -404,7 +413,7 @@ bool _simple_expression_aux() {
     token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
     token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || 
     token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED ||
-    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
   ) {
     result = follow = true;
   }
@@ -463,7 +472,7 @@ bool _term_aux() {
     token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
     token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || token == DELIMITER_GREATER_THAN_EQUAL ||
     token == DELIMITER_PLUS || token == DELIMITER_DASH || token == DELIMITER_AND || token == DELIMITER_PAR_CLOSED ||
-    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
   ) {
     result = follow = true;
   }
@@ -599,6 +608,23 @@ bool _choice() {
     result = true;
   } else if (_expression()) {
     result = true;
+  }
+  return result;
+}
+
+bool _sample_inst(){
+  bool result = false;
+  if(token == IDENTIFIER){
+    _read_token();
+    if(token == DELIMITER_ASSIGN){
+      _read_token();
+      if(_expression()){
+        _read_token();
+        if(token == DELIMITER_SEMICOLON){
+          result = true;
+        }
+      }
+    }
   }
   return result;
 }

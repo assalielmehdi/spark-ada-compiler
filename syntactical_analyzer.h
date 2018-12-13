@@ -179,4 +179,6 @@ bool _choice_list_aux();
 
 bool _choice();
 
+bool _sample_inst();
+
 #endif
