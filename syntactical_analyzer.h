@@ -179,14 +179,18 @@ bool _choice_list_aux();
 
 bool _choice();
 
+bool _identified_statement();
+
+bool _identified_statement_aux();
+
 bool _sample_inst();
+
+bool _identified_loop_statement();
 
 bool _loop_statement();
 
 bool _loop_statement_aux();
 
 bool _loop_statement_aux_aux();
-
-bool _loop_statement_aux_aux_aux();
 
 #endif

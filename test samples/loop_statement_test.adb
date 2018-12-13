@@ -28,4 +28,10 @@ while (test1 < 5.0) loop
   test1 := 3;
 end loop myLoop;
 
+loop
+  if test1 < 0 then
+    test := 1.0;
+  end if;
+end loop;
+
 end test;

@@ -47,7 +47,7 @@ Const [DONE] {
 List_inst [UNCOMPLETED] {
   If_statement List_inst_aux,
   Case_statement List_inst_aux,
-  Sample_inst List_inst_aux,
+  Identified_statement List_inst,
   Loop_statement List_inst_aux,
   _epsilon,
   FOLLOW = {'end', 'elsif', 'else', 'when'}

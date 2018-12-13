@@ -164,13 +164,17 @@ bool _list_inst() {
     if (_list_inst_aux()) {
       result = true;
     } 
-  } else if(_sample_inst()){
+  } else if (_identified_statement()){
     _read_token();
     if(_list_inst_aux()){
       result = true;
     }
-  }
-  else if (
+  } else if (_loop_statement()) {
+    _read_token();
+    if(_list_inst_aux()){
+      result = true;
+    }
+  } else if (
     token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
     token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
   ) {
@@ -193,6 +197,7 @@ bool _list_inst_aux() {
 }
 
 bool _if_statement() {
+  printf("_if_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_IF) {
     _read_token();
@@ -517,6 +522,7 @@ bool _case_statement() {
   printf("_case_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_CASE) {
+    puts("!");
     _read_token();
     if (_expression()) {
       _read_token();
@@ -612,19 +618,51 @@ bool _choice() {
   return result;
 }
 
-bool _sample_inst() {
-  printf("_sample_inst() : %s\n", yytext);
+bool _identified_statement() {
+  printf("_identified_statement() : %s\n", yytext);
   bool result = false;
   if (token == IDENTIFIER) {
     _read_token();
-    if (token == DELIMITER_ASSIGN) {
+    if (_identified_statement_aux()) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool _identified_statement_aux() {
+  printf("_identified_statement_aux() : %s\n", yytext);
+  bool result = false;
+  if (_sample_inst()) {
+    result = true;
+  } else if (_identified_loop_statement()) {
+    result = true;
+  }
+  return result;
+}
+
+bool _sample_inst() {
+  printf("_sample_inst() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_ASSIGN) {
+    _read_token();
+    if (_expression()) {
       _read_token();
-      if (_expression()) {
-        _read_token();
-        if( token == DELIMITER_SEMICOLON) {
-          result = true;
-        }
+      if (token == DELIMITER_SEMICOLON) {
+        result = true;
       }
+    }
+  }
+  return result;
+}
+
+bool _identified_loop_statement() {
+  printf("_identified_loop_statement() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_PERIOD) {
+    _read_token();
+    if (_loop_statement()) {
+      result = true;
     }
   }
   return result;
@@ -633,9 +671,9 @@ bool _sample_inst() {
 bool _loop_statement() {
   printf("_loop_statement() : %s\n", yytext);
   bool result = false;
-  if (token == IDENTIFIER) {
+  if (token == KEY_WORD_WHILE) {
     _read_token();
-    if (token == DELIMITER_ASSIGN) {
+    if (_expression()) {
       _read_token();
       if (_loop_statement_aux()) {
         result = true;
@@ -643,29 +681,12 @@ bool _loop_statement() {
     }
   } else if (_loop_statement_aux()) {
     result = true;
-  }
+  } 
   return result;
 }
 
 bool _loop_statement_aux() {
   printf("_loop_statement_aux() : %s\n", yytext);
-  bool result = false;
-  if (token == KEY_WORD_WHILE) {
-    _read_token();
-    if (_expression()) {
-      _read_token();
-      if (_loop_statement_aux_aux()) {
-        result = true;
-      }
-    }
-  } else if (_loop_statement_aux_aux()) {
-    result = true;
-  } 
-  return result;
-}
-
-bool _loop_statement_aux_aux() {
-  printf("_loop_statement_aux_aux() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_LOOP) {
     _read_token();
@@ -675,7 +696,7 @@ bool _loop_statement_aux_aux() {
         _read_token();
         if (token == KEY_WORD_LOOP) {
           _read_token();
-          if (_loop_statement_aux_aux_aux()) {
+          if (_loop_statement_aux_aux()) {
             result = true;
           }
         }
@@ -685,8 +706,8 @@ bool _loop_statement_aux_aux() {
   return result;
 }
 
-bool _loop_statement_aux_aux_aux() {
-  printf("_loop_statement_aux_aux_aux() : %s\n", yytext);
+bool _loop_statement_aux_aux() {
+  printf("_loop_statement_aux_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_SEMICOLON) {
     result = true;
