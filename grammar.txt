@@ -48,6 +48,7 @@ List_inst [UNCOMPLETED] {
   If_statement List_inst_aux,
   Case_statement List_inst_aux,
   Sample_inst List_inst_aux,
+  Loop_statement List_inst_aux,
   _epsilon,
   FOLLOW = {'end', 'elsif', 'else', 'when'}
 }
@@ -81,7 +82,7 @@ Expression_aux [DONE] {
   'xor' Relation,
   'or' Relation,
   _epsilon,
-  FOLLOW = {'then', ')', '=>', 'is', '|', ';'}
+  FOLLOW = {'then', ')', '=>', 'is', '|', ';', 'loop'}
 }
 
 Relation [DONE] {
@@ -96,7 +97,7 @@ Relation_aux [UNCOMPLETED] {
   '>' Simple_expression,
   '>=' Simple_expression,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', ')', '=>', 'is', '|', ';'}
+  FOLLOW = {'then', 'and', 'xor', 'or', ')', '=>', 'is', '|', ';', 'loop'}
 }
 
 Simple_expression [DONE] {
@@ -110,7 +111,10 @@ Simple_expression_aux [DONE] {
   '-' Term Simple_expression_aux,
   '&' Term Simple_expression_aux,
   _epsilon,
-  FOLLOW = {'then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', ')', '=>', 'is', '|', ';'}
+  FOLLOW = {
+    'then', 'and', 'xor', 'or', '=', '/=', '<',
+    '<=', '>', '>=', ')', '=>', 'is', '|', ';', 'loop'
+  }
 }
 
 Term [DONE] {
@@ -123,7 +127,10 @@ Term_aux [DONE] {
   'mod' Factor Term_aux,
   'rem' Factor Term_aux,
   _epsilon,
-  FOLLOW = {then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>', '>=', '+', '/', '&', ')', '=>', 'is', '|', ';'}
+  FOLLOW = {
+    then', 'and', 'xor', 'or', '=', '/=', '<', '<=', '>',
+    '>=', '+', '/', '&', ')', '=>', 'is', '|', ';', 'loop'
+  }
 }
 
 Factor [UNCOMPLETED] {
@@ -167,25 +174,33 @@ Choise [UNCOMPLETED] {
   Expression
 }
 
+Identified_statement [DONE] {
+  Idf Identified_statement_aux
+}
+
+Identified_statement_aux [UNCOMPLETED] {
+  Sample_inst,
+  Identified_loop_statement
+}
+
 Sample_inst [DONE] {
-  Idf ':=' Expression ';'
+  ':=' Expression ';'
 }
 
-Loop_statement [DONE] {
-  Idf ':' Loop_statement_aux,
-  Loop_statement_aux
+Identified_loop_statement [DONE] {
+  ':' Loop_statement,
 }
 
-Loop_statement_aux [UNCOMPLETED] {
+Loop_statement [UNCOMPLETED] {
   'while' Expression Loop_statement_aux_aux,
   Loop_statement_aux_aux
 }
 
-Loop_statement_aux_aux [DONE] {
+Loop_statement_aux [DONE] {
   'loop' List_inst 'end' 'loop' Loop_statement_aux_aux_aux
 }
 
-Loop_statement_aux_aux_aux [DONE] {
+Loop_statement_aux_aux [DONE] {
   Idf ';',
   ';'
 }

@@ -288,7 +288,8 @@ bool _expression_aux() {
     }
   } else if (
     token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED || token == DELIMITER_FAT_ARROW || 
-    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
+    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON ||
+    token == KEY_WORD_LOOP
   ) {
     result = follow = true;
   }
@@ -343,7 +344,8 @@ bool _relation_aux() {
   } else if (
     token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || 
     token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED || token == DELIMITER_FAT_ARROW || 
-    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
+    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON ||
+    token == KEY_WORD_LOOP
   ) {
     result = follow = true;
   }
@@ -410,7 +412,8 @@ bool _simple_expression_aux() {
     token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
     token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || 
     token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED ||
-    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
+    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || 
+    token == DELIMITER_SEMICOLON || token == KEY_WORD_LOOP
   ) {
     result = follow = true;
   }
@@ -622,6 +625,75 @@ bool _sample_inst() {
           result = true;
         }
       }
+    }
+  }
+  return result;
+}
+
+bool _loop_statement() {
+  printf("_loop_statement() : %s\n", yytext);
+  bool result = false;
+  if (token == IDENTIFIER) {
+    _read_token();
+    if (token == DELIMITER_ASSIGN) {
+      _read_token();
+      if (_loop_statement_aux()) {
+        result = true;
+      }
+    }
+  } else if (_loop_statement_aux()) {
+    result = true;
+  }
+  return result;
+}
+
+bool _loop_statement_aux() {
+  printf("_loop_statement_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_WHILE) {
+    _read_token();
+    if (_expression()) {
+      _read_token();
+      if (_loop_statement_aux_aux()) {
+        result = true;
+      }
+    }
+  } else if (_loop_statement_aux_aux()) {
+    result = true;
+  } 
+  return result;
+}
+
+bool _loop_statement_aux_aux() {
+  printf("_loop_statement_aux_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == KEY_WORD_LOOP) {
+    _read_token();
+    if (_list_inst()) {
+      _read_token();
+      if (KEY_WORD_END) {
+        _read_token();
+        if (token == KEY_WORD_LOOP) {
+          _read_token();
+          if (_loop_statement_aux_aux_aux()) {
+            result = true;
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+
+bool _loop_statement_aux_aux_aux() {
+  printf("_loop_statement_aux_aux_aux() : %s\n", yytext);
+  bool result = false;
+  if (token == DELIMITER_SEMICOLON) {
+    result = true;
+  } else if (token == IDENTIFIER) {
+    _read_token();
+    if (token == DELIMITER_SEMICOLON) {
+      result = true;
     }
   }
   return result;

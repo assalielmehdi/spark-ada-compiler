@@ -181,4 +181,12 @@ bool _choice();
 
 bool _sample_inst();
 
+bool _loop_statement();
+
+bool _loop_statement_aux();
+
+bool _loop_statement_aux_aux();
+
+bool _loop_statement_aux_aux_aux();
+
 #endif
