@@ -4,6 +4,7 @@
 - [Anass BAIROUK](https://www.linkedin.com/in/anass-bairouk-258673109/)
 - [Widad BOUJAAFAR](https://www.linkedin.com/in/widad-boujaafar-a9829415b/)
 - [El Mehdi ASSALI](https://www.linkedin.com/in/assalielmehdi/)
+- [Brahim ADREF](https://www.linkedin.com/in/brahim-adref-985653152/)
 
 ### Supervised by: 
 - [Dr. Karim BAINA](https://www.linkedin.com/in/karimbaina/) 
