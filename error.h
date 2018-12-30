@@ -16,7 +16,7 @@ _semantic_error *_create_semantic_error(_semantic_error_type type, int line, cha
 
 void _add_semantic_error(_semantic_error_type type, int line, char *name);
 
-void _show_semantic_error(_semantic_error_type type, int line, char *name);
+void _show_semantic_error(_semantic_error *error);
 
 void _show_semantic_errors();
 

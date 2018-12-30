@@ -21,9 +21,9 @@ void _add_semantic_error(_semantic_error_type type, int line, char *name) {
   _errors[_errors_count++] = _create_semantic_error(type, line, name);
 }
 
-void _show_semantic_error(_semantic_error_type type, int line, char *name) {
-  printf("ligne %d : %s ", line, name);
-  switch (type) {
+void _show_semantic_error(_semantic_error *error) {
+  printf("ligne %d : %s ", error->line, error->name);
+  switch (error->type) {
     case ALREADY_DECLARED : 
       printf("Already Declared\n");
       break;
@@ -34,8 +34,8 @@ void _show_semantic_error(_semantic_error_type type, int line, char *name) {
 }
 
 void _show_semantic_errors() {
-	for(int i = 0; i < _errors_count; i++) {
-		_show_semantic_error(_errors[i]->type, _errors[i]->line, _errors[i]->name);
+  for(int i = 0; i < _errors_count; i++) {
+		_show_semantic_error(_errors[i]);
 	}
 }
 
