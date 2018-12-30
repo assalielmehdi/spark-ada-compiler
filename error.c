@@ -1,70 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "error.h"
 
-#include <stdlib.h>
+#define MAX_ERRORS 100
 
-#include <string.h>
+int _errors_count = 0;
+_semantic_error *_errors[MAX_ERRORS];
 
-#include <stdio.h>
-
-
-
-#define MAXSIZE 100
-
-static int NODEr = 0; //NumberOfDeclarationErrors
-
-static smerror * ARRAYDECL[MAXSIZE];
-
-
-
-smerror *_create_sm_error(SemanticErrorType et, int line, char * name){
-
-  smerror *e = (smerror*) malloc (sizeof (smerror) );
-
-  e->type = et;
-
+_semantic_error *_create_semantic_error(_semantic_error_type type, int line, char *name) {
+  _semantic_error *e = (_semantic_error *) malloc(sizeof(_semantic_error));
+  e->type = type;
   e->line = line;
-
-  e->name = (char *) malloc (strlen(name));
-
+  e->name = (char *) malloc(strlen(name) + 1);
   strcpy(e->name, name);
-
   return e;
-
 }
 
-void _create_sm_error_declaration(SemanticErrorType et, int line, char* name){
-
-  ARRAYDECL[NODEr++]= _create_sm_error(et, line, name);
-
+void _add_semantic_error(_semantic_error_type type, int line, char *name) {
+  _errors[_errors_count++] = _create_semantic_error(type, line, name);
 }
 
-void _show_sm_error(SemanticErrorType et, int line, char* name){
-
-	printf("ligne %d : %s ", line,  name);
-
-  switch (et){
-
-  case AlreadyDeclared: printf("AlreadyDeclared\n"); break;
-
-  case BadlyInitialized:  printf("BadlyInitialized\n"); break;
-
+void _show_semantic_error(_semantic_error_type type, int line, char *name) {
+  printf("ligne %d : %s ", line, name);
+  switch (type) {
+    case ALREADY_DECLARED : 
+      printf("Already Declared\n");
+      break;
+    case BADLY_INITIALIZED:
+      printf("Badly Initialized\n");
+      break;
   }
-
 }
 
-void _show_sm_errors(){
-
-	for(int i=0;i<NODEr;i++){
-
-		_show_sm_error(ARRAYDECL[i]->type,ARRAYDECL[i]->line,ARRAYDECL[i]->name);
-
+void _show_semantic_errors() {
+	for(int i = 0; i < _errors_count; i++) {
+		_show_semantic_error(_errors[i]->type, _errors[i]->line, _errors[i]->name);
 	}
-
 }
 
-
-int nombre_sm_errors(){
-
-	return NODEr;
-
+int _count_semantic_errors() {
+	return _errors_count;
 }

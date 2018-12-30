@@ -1,37 +1,25 @@
-#ifndef error_H
+#ifndef ERROR_H
+#define ERROR_H
 
-#define error_H
-
-
-
-typedef enum{
-
-AlreadyDeclared,              
-
-BadlyInitialized,
-
-}SemanticErrorType;
+typedef enum {
+  ALREADY_DECLARED,
+  BADLY_INITIALIZED,
+} _semantic_error_type;
 
 typedef struct {
-
   char *name;
-
   int line;
+  _semantic_error_type type;
+} _semantic_error;
 
-  SemanticErrorType type;
+_semantic_error *_create_semantic_error(_semantic_error_type type, int line, char *name);
 
-} smerror;
+void _add_semantic_error(_semantic_error_type type, int line, char *name);
 
-smerror *_create_sm_error(SemanticErrorType et, int line, char * name);
+void _show_semantic_error(_semantic_error_type type, int line, char *name);
 
-void _create_sm_error_declaration(SemanticErrorType et, int line, char* name);
+void _show_semantic_errors();
 
-void _show_sm_error(SemanticErrorType et, int line, char* name);
-
-void _show_sm_errors();
-
-int nombre_sm_errors();
-
-
+int _count_semantic_errors();
 
 #endif
