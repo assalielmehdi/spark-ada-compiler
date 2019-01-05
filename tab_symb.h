@@ -5,18 +5,17 @@
 #include "syntactical_analyzer.h"
 #endif
 
-
 typedef struct {
   char *name;
   char *type;
   int  line;
   bool initialized;
-  float  value;   
-}_var_value_type;
+  float value;   
+} _var_info;
 
-_var_value_type *_create_var(char *name, char *type, int  line,bool initialized, float  value);
+_var_info *_create_var(char *name, char *type, int line, bool initialized, float value);
 
-bool _add_var_to_tab_symbol(_var_value_type *var);
+bool _add_var_to_tab_symbol(_var_info *var);
 
 bool _in_tab_symbol(char * name);
 
