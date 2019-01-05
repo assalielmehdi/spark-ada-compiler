@@ -1,8 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "syntactical_analyzer.h"
+#include "tab_symb.h"
+
+#define DEBUG_MODE false
 
 _token_type token;
 
 bool follow = false;
+
+_var_info *var = NULL;
 
 int main() {
   _read_token();
@@ -10,6 +18,10 @@ int main() {
     puts("OK");
   } else {
     puts("NOK");
+  }
+  if (DEBUG_MODE == true) {
+    puts("--------------------");
+    _print_tab_symbol();
   }
   return 0;
 }
@@ -23,6 +35,7 @@ void _read_token() {
 }
 
 bool _proc() {
+  if (DEBUG_MODE == true) printf("_proc() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_PROCEDURE) {
     _read_token();
@@ -55,6 +68,7 @@ bool _proc() {
 }
 
 bool _list_decl() {
+  if (DEBUG_MODE == true) printf("_list_decl() : %s\n", yytext);
   bool result = false;
   if (_decl()) {
     _read_token();
@@ -66,8 +80,13 @@ bool _list_decl() {
 }
 
 bool _decl() {
+  if (DEBUG_MODE == true) printf("_decl() : %s\n", yytext);
   bool result = false;
   if (token == IDENTIFIER) {
+    var = (_var_info *) malloc(sizeof(_var_info));
+    var->name = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
+    strcpy(var->name, yytext);
+    if (DEBUG_MODE == true) printf("var_name: %s\n", var->name);
     _read_token();
     if (token == DELIMITER_PERIOD) {
       _read_token();
@@ -80,8 +99,12 @@ bool _decl() {
 }
 
 bool _decl_aux() {
+  if (DEBUG_MODE == true) printf("_decl_aux() : %s\n", yytext);
   bool result = false;
   if (_type()) {
+    var->type = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
+    strcpy(var->type, yytext);
+    if (DEBUG_MODE == true) printf("var_type: %s\n", var->type);
     _read_token();
     if (_decl_aux_aux()) {
       result = true;
@@ -99,22 +122,51 @@ bool _decl_aux() {
 }
 
 bool _decl_aux_aux() {
+  if (DEBUG_MODE == true) printf("_decl_aux_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_ASSIGN) {
+    var->initialized = true;
+    if (DEBUG_MODE == true) printf("var_initialized: %d\n", var->initialized);
     _read_token();
     if (_const()) {
+      if (token == STRING_LITERAL || token == CHARACTER_LITERAL) {
+        var->value.string_value = (char *) malloc((strlen(yytext) - 1) * sizeof(char));
+        strncpy(var->value.string_value, yytext + 1, strlen(yytext) - 2);
+        var->value_type = VAR_VALUE_STRING;
+        if (DEBUG_MODE == true) printf("var_value: %s\n", var->value.string_value);
+      } else if (token == BOOLEAN_TRUE_VALUE) {
+        var->value.number_value = 1.0;
+        var->value_type = VAR_VALUE_BOOLEAN;
+        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
+      } else if (token == BOOLEAN_FALSE_VALUE) {
+        var->value.number_value = 0.0;
+        var->value_type = VAR_VALUE_BOOLEAN;
+        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
+      } else {
+        var->value.number_value = (float) atof(yytext);
+        var->value_type = VAR_VALUE_NUMBER;
+        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
+      } 
       _read_token();
       if (token == DELIMITER_SEMICOLON) {
+        if (_add_var_to_tab_symbol(var) == false) {
+          printf("Variable already declared\n");
+        };
         result = true;
       }
     }
   } else if (token == DELIMITER_SEMICOLON) {
+    var->initialized = false;
+    if (_add_var_to_tab_symbol(var) == false) {
+      printf("Variable already declared\n");
+    };
     result = true;
   }
   return result;
 }
 
 bool _list_decl_aux() {
+  if (DEBUG_MODE == true) printf("_list_decl_aux() : %s\n", yytext);
   bool result = false;
   if (_list_decl()) {
     result  = true;
@@ -125,6 +177,7 @@ bool _list_decl_aux() {
 }
 
 bool _type() {
+  if (DEBUG_MODE == true) printf("_type() : %s\n", yytext);
   bool result = false;
   if (token == IDENTIFIER && !(
       strcmp(yytext, "Integer") * strcmp(yytext, "Float")  *
@@ -138,6 +191,7 @@ bool _type() {
 }
 
 bool _const() {
+  if (DEBUG_MODE == true) printf("_const() : %s\n", yytext);
   bool result = false;
   if (
     token == CHARACTER_LITERAL ||
@@ -153,6 +207,7 @@ bool _const() {
 }
 
 bool _list_inst() {
+  if (DEBUG_MODE == true) printf("_list_inst() : %s\n", yytext);
   bool result = false;
   if (_if_statement()) {
     _read_token();
@@ -184,6 +239,7 @@ bool _list_inst() {
 }
 
 bool _list_inst_aux() {
+  if (DEBUG_MODE == true) printf("_list_inst_aux() : %s\n", yytext);
   bool result = false;
   if (_list_inst()) {
     result = true;
@@ -197,7 +253,7 @@ bool _list_inst_aux() {
 }
 
 bool _if_statement() {
-  printf("_if_statement() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_if_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_IF) {
     _read_token();
@@ -218,6 +274,7 @@ bool _if_statement() {
 }
 
 bool _elsif_statement() {
+  if (DEBUG_MODE == true) printf("_elsif_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_ELSIF) {
     _read_token();
@@ -248,6 +305,7 @@ bool _elsif_statement() {
 }
 
 bool _endif_statement() {
+  if (DEBUG_MODE == true) printf("_endif_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_END) {
     _read_token();
@@ -262,7 +320,7 @@ bool _endif_statement() {
 }
 
 bool _expression() {
-  printf("_expression() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_expression() : %s\n", yytext);
   bool result = false;
   if (_relation()) {
     _read_token();
@@ -274,7 +332,7 @@ bool _expression() {
 }
 
 bool _expression_aux() {
-  printf("_expression_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_expression_aux() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_AND) {
     _read_token();
@@ -302,7 +360,7 @@ bool _expression_aux() {
 }
 
 bool _relation() {
-  printf("_relation() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_relation() : %s\n", yytext);
   bool result = false;
   if (_simple_expression()) {
     _read_token();
@@ -314,7 +372,7 @@ bool _relation() {
 }
 
 bool _relation_aux() {
-  printf("_relation_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_EQUAL) {
     _read_token();
@@ -358,7 +416,7 @@ bool _relation_aux() {
 }
 
 bool _simple_expression() {
-  printf("_simple_expression() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_simple_expression() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_PLUS) {
     _read_token();
@@ -386,7 +444,7 @@ bool _simple_expression() {
 }
 
 bool _simple_expression_aux() {
-  printf("_simple_expression_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_simple_expression_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_PLUS) {
     _read_token();
@@ -426,7 +484,7 @@ bool _simple_expression_aux() {
 }
 
 bool _term() {
-  printf("_term() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_term() : %s\n", yytext);
   bool result = false;
   if (_factor()) {
     _read_token();
@@ -438,7 +496,7 @@ bool _term() {
 }
 
 bool _term_aux() {
-  printf("_term_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_term_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_STAR) {
     _read_token();
@@ -485,7 +543,7 @@ bool _term_aux() {
 }
 
 bool _factor() {
-  printf("_factor() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_factor() : %s\n", yytext);
   bool result = false;
   if (_primary()) {
     result = true;
@@ -494,7 +552,7 @@ bool _factor() {
 }
 
 bool _primary() {
-  printf("_primary() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_primary() : %s\n", yytext);
   bool result = false;
   if (token == INTEGER_VALUE) {
     result = true;
@@ -519,7 +577,7 @@ bool _primary() {
 }
 
 bool _case_statement() {
-  printf("_case_statement() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_case_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_CASE) {
     puts("!");
@@ -541,7 +599,7 @@ bool _case_statement() {
 }
 
 bool _case_statement_aux() {
-  printf("_case_statement_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_case_statement_aux() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_END) {
     _read_token();
@@ -561,7 +619,7 @@ bool _case_statement_aux() {
 }
 
 bool _case_statement_alternative() {
-  printf("_case_statement_alternative() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_case_statement_alternative() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_WHEN) {
     _read_token();
@@ -579,7 +637,7 @@ bool _case_statement_alternative() {
 }
 
 bool _choice_list() {
-  printf("_choice_list() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_choice_list() : %s\n", yytext);
   bool result = false;
   if (_choice()) {
     _read_token();
@@ -591,7 +649,7 @@ bool _choice_list() {
 }
 
 bool _choice_list_aux() {
-  printf("_choice_list_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_choice_list_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_PIPE) {
     _read_token();
@@ -608,7 +666,7 @@ bool _choice_list_aux() {
 }
 
 bool _choice() {
-  printf("_choice() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_choice() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_OTHERS) {
     result = true;
@@ -619,7 +677,7 @@ bool _choice() {
 }
 
 bool _identified_statement() {
-  printf("_identified_statement() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_identified_statement() : %s\n", yytext);
   bool result = false;
   if (token == IDENTIFIER) {
     _read_token();
@@ -631,7 +689,7 @@ bool _identified_statement() {
 }
 
 bool _identified_statement_aux() {
-  printf("_identified_statement_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_identified_statement_aux() : %s\n", yytext);
   bool result = false;
   if (_sample_inst()) {
     result = true;
@@ -642,7 +700,7 @@ bool _identified_statement_aux() {
 }
 
 bool _sample_inst() {
-  printf("_sample_inst() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_sample_inst() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_ASSIGN) {
     _read_token();
@@ -657,7 +715,7 @@ bool _sample_inst() {
 }
 
 bool _identified_loop_statement() {
-  printf("_identified_loop_statement() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_identified_loop_statement() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_PERIOD) {
     _read_token();
@@ -669,7 +727,7 @@ bool _identified_loop_statement() {
 }
 
 bool _loop_statement() {
-  printf("_loop_statement() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_loop_statement() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_WHILE) {
     _read_token();
@@ -686,7 +744,7 @@ bool _loop_statement() {
 }
 
 bool _loop_statement_aux() {
-  printf("_loop_statement_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_loop_statement_aux() : %s\n", yytext);
   bool result = false;
   if (token == KEY_WORD_LOOP) {
     _read_token();
@@ -707,7 +765,7 @@ bool _loop_statement_aux() {
 }
 
 bool _loop_statement_aux_aux() {
-  printf("_loop_statement_aux_aux() : %s\n", yytext);
+  if (DEBUG_MODE == true) printf("_loop_statement_aux_aux() : %s\n", yytext);
   bool result = false;
   if (token == DELIMITER_SEMICOLON) {
     result = true;

@@ -1,9 +1,7 @@
 #ifndef SYNTACTICAL_ANALYZER
 #define SYNTACTICAL_ANALYZER
 
-#include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
 
 typedef enum {
   KEY_WORD_ABORT,

@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.lex": "lex",
+    "syntactical_analyzer.h": "c"
+  }
+}
