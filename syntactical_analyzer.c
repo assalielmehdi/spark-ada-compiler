@@ -14,6 +14,7 @@ bool follow = false;
 _var_info *var = NULL;
 
 int main() {
+  _reset_tab_symbol();
   _read_token();
   if (_proc()) {
     puts("OK");
@@ -153,7 +154,7 @@ bool _decl_aux_aux() {
       _read_token();
       if (token == DELIMITER_SEMICOLON) {
         if (_add_var_to_tab_symbol(var) == false) {
-          printf("Variable already declared\n");
+          _add_semantic_error(ALREADY_DECLARED,var->line,var->name);
         };
         result = true;
       }
