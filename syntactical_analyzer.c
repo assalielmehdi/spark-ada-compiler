@@ -156,6 +156,9 @@ bool _decl_aux_aux() {
         if (_add_var_to_tab_symbol(var) == false) {
           _add_semantic_error(ALREADY_DECLARED,var->line,var->name);
         };
+        if(_check_value_type(var->value_type,var->value) == false){
+          _add_semantic_error(BADLY_INITIALIZED,var->line,var->name);
+        };
         result = true;
       }
     }
