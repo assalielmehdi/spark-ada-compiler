@@ -1,7 +1,0 @@
-{
-  "files.associations": {
-    "*.lex": "lex",
-    "syntactical_analyzer.h": "c"
-  },
-  "python.pythonPath": "/opt/local/bin/python3.7"
-}
