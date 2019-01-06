@@ -3,6 +3,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include "tab_symb.h"
+#include "syntactical_analyzer.h"
 
 #define MAX_VAR 100
 
@@ -36,6 +37,21 @@ bool _in_tab_symbol(char *name) {
   for (int i = 0; i < _var_count && result == false; i++) {
     result = (strcmp(_tab_symbol[i]->name, name) == 0);
   }
+  return result;
+}
+
+bool _check_value_type(_var_value_type value_type, _var_value value){
+  bool result = false;
+  if(value_type == VAR_VALUE_NUMBER && value.number_value == INTEGER_VALUE)
+    result = true;
+  else if(value_type == VAR_VALUE_NUMBER && value.number_value == FLOAT_VALUE)
+    result = true;
+  else if(value_type == VAR_VALUE_BOOLEAN && value.number_value == BOOLEAN_TRUE_VALUE || value.number_value == BOOLEAN_FALSE_VALUE)
+    result = true;
+  else if(value_type == VAR_VALUE_STRING && value.string_value == "STRING_LITERAL")
+    result = true;
+  else if(value_type == VAR_VALUE_CHARACTER && value.string_value == "CHARACTER_LITERAL")
+    result = true;
   return result;
 }
 
