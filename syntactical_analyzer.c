@@ -7,11 +7,13 @@
 
 #define DEBUG_MODE false
 
-_token_type token;
+_token_type _token;
 
-bool follow = false;
+bool _follow = false;
 
-_var_info *var = NULL;
+_var_info *_var = NULL;
+
+char *_current_var_name = NULL;
 
 int main() {
   _reset_tab_symbol();
@@ -30,33 +32,33 @@ int main() {
 }
 
 void _read_token() {
-  if (follow) {
-    follow = false;
+  if (_follow) {
+    _follow = false;
   } else {
-    token = (_token_type) yylex();
+    _token = (_token_type) yylex();
   }
 }
 
 bool _proc() {
   if (DEBUG_MODE == true) printf("_proc() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_PROCEDURE) {
+  if (_token == KEY_WORD_PROCEDURE) {
     _read_token();
-    if (token == IDENTIFIER) {
+    if (_token == IDENTIFIER) {
       _read_token();
-      if (token == KEY_WORD_IS) {
+      if (_token == KEY_WORD_IS) {
         _read_token();
         if (_list_decl()) {
           _read_token();
-          if (token == KEY_WORD_BEGIN) {
+          if (_token == KEY_WORD_BEGIN) {
             _read_token();
             if (_list_inst()) {
               _read_token();
-              if (token == KEY_WORD_END) {
+              if (_token == KEY_WORD_END) {
                 _read_token();
-                if (token == IDENTIFIER) {
+                if (_token == IDENTIFIER) {
                   _read_token();
-                  if (token == DELIMITER_SEMICOLON) {
+                  if (_token == DELIMITER_SEMICOLON) {
                     result = true;
                   }
                 }
@@ -85,13 +87,13 @@ bool _list_decl() {
 bool _decl() {
   if (DEBUG_MODE == true) printf("_decl() : %s\n", yytext);
   bool result = false;
-  if (token == IDENTIFIER) {
-    var = (_var_info *) malloc(sizeof(_var_info));
-    var->name = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
-    strcpy(var->name, yytext);
-    if (DEBUG_MODE == true) printf("var_name: %s\n", var->name);
+  if (_token == IDENTIFIER) {
+    _var = (_var_info *) malloc(sizeof(_var_info));
+    _var->name = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
+    strcpy(_var->name, yytext);
+    if (DEBUG_MODE == true) printf("var_name: %s\n", _var->name);
     _read_token();
-    if (token == DELIMITER_PERIOD) {
+    if (_token == DELIMITER_PERIOD) {
       _read_token();
       if (_decl_aux()) {
         result = true;
@@ -105,26 +107,26 @@ bool _decl_aux() {
   if (DEBUG_MODE == true) printf("_decl_aux() : %s\n", yytext);
   bool result = false;
   if (_type()) {
-    var->type = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
-    strcpy(var->type, yytext);
-    var->line = yylineno;
+    _var->type = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
+    strcpy(_var->type, yytext);
+    _var->line = yylineno;
     if (strcmp(yytext, "Integer") == 0) {
-      var->value_type = VAR_VALUE_INTEGER;
+      _var->value_type = VAR_VALUE_INTEGER;
     }  else if (strcmp(yytext, "Float") == 0) {
-      var->value_type = VAR_VALUE_FLOAT;
+      _var->value_type = VAR_VALUE_FLOAT;
     } else if (strcmp(yytext, "Boolean") == 0) {
-      var->value_type = VAR_VALUE_BOOLEAN;
+      _var->value_type = VAR_VALUE_BOOLEAN;
     } else if (strcmp(yytext, "String") == 0) {
-      var->value_type = VAR_VALUE_STRING;
+      _var->value_type = VAR_VALUE_STRING;
     } else if (strcmp(yytext, "Character") == 0) {
-      var->value_type = VAR_VALUE_CHARACTER;
+      _var->value_type = VAR_VALUE_CHARACTER;
     }
-    if (DEBUG_MODE == true) printf("var_type: %s\n", var->type);
+    if (DEBUG_MODE == true) printf("var_type: %s\n", _var->type);
     _read_token();
     if (_decl_aux_aux()) {
       result = true;
     }
-  } else if (token == KEY_WORD_CONSTANT) {
+  } else if (_token == KEY_WORD_CONSTANT) {
     _read_token();
     if (_type()) {
       _read_token();
@@ -139,32 +141,32 @@ bool _decl_aux() {
 bool _decl_aux_aux() {
   if (DEBUG_MODE == true) printf("_decl_aux_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_ASSIGN) {
-    var->initialized = true;
-    if (DEBUG_MODE == true) printf("var_initialized: %d\n", var->initialized);
+  if (_token == DELIMITER_ASSIGN) {
+    _var->initialized = true;
+    if (DEBUG_MODE == true) printf("var_initialized: %d\n", _var->initialized);
     _read_token();
     if (_const()) {
       if (
-        (token == CHARACTER_LITERAL && var->value_type != VAR_VALUE_CHARACTER) ||
-        (token == STRING_LITERAL && var->value_type != VAR_VALUE_STRING) ||
-        (token == INTEGER_VALUE && var->value_type != VAR_VALUE_INTEGER) ||
-        (token == FLOAT_VALUE && var->value_type != VAR_VALUE_FLOAT) ||
-        ((token == BOOLEAN_TRUE_VALUE || token == BOOLEAN_FALSE_VALUE) && var->value_type != VAR_VALUE_BOOLEAN)
+        (_token == CHARACTER_LITERAL && _var->value_type != VAR_VALUE_CHARACTER) ||
+        (_token == STRING_LITERAL && _var->value_type != VAR_VALUE_STRING) ||
+        (_token == INTEGER_VALUE && _var->value_type != VAR_VALUE_INTEGER) ||
+        (_token == FLOAT_VALUE && _var->value_type != VAR_VALUE_FLOAT) ||
+        ((_token == BOOLEAN_TRUE_VALUE || _token == BOOLEAN_FALSE_VALUE) && _var->value_type != VAR_VALUE_BOOLEAN)
       ) {
-        _add_semantic_error(BADLY_INITIALIZED, var->line, var->name);
+        _add_semantic_error(BADLY_INITIALIZED, _var->line, _var->name);
       }
       _read_token();
-      if (token == DELIMITER_SEMICOLON) {
-        if (_add_var_to_tab_symbol(var) == false) {
-          _add_semantic_error(ALREADY_DECLARED, var->line, var->name);
+      if (_token == DELIMITER_SEMICOLON) {
+        if (_add_var_to_tab_symbol(_var) == false) {
+          _add_semantic_error(ALREADY_DECLARED, _var->line, _var->name);
         };
         result = true;
       }
     }
-  } else if (token == DELIMITER_SEMICOLON) {
-    var->initialized = false;
-    if (_add_var_to_tab_symbol(var) == false) {
-      _add_semantic_error(ALREADY_DECLARED, var->line, var->name);
+  } else if (_token == DELIMITER_SEMICOLON) {
+    _var->initialized = false;
+    if (_add_var_to_tab_symbol(_var) == false) {
+      _add_semantic_error(ALREADY_DECLARED, _var->line, _var->name);
     };
     result = true;
   }
@@ -176,8 +178,8 @@ bool _list_decl_aux() {
   bool result = false;
   if (_list_decl()) {
     result  = true;
-  } else if (token == KEY_WORD_BEGIN) {
-    result = follow = true;
+  } else if (_token == KEY_WORD_BEGIN) {
+    result = _follow = true;
   }
   return result;
 }
@@ -185,7 +187,7 @@ bool _list_decl_aux() {
 bool _type() {
   if (DEBUG_MODE == true) printf("_type() : %s\n", yytext);
   bool result = false;
-  if (token == IDENTIFIER && !(
+  if (_token == IDENTIFIER && !(
       strcmp(yytext, "Integer") * strcmp(yytext, "Float")  *
       strcmp(yytext, "Boolean") * strcmp(yytext, "Character") *
       strcmp(yytext, "Natural") * strcmp(yytext, "Positive") *
@@ -200,12 +202,12 @@ bool _const() {
   if (DEBUG_MODE == true) printf("_const() : %s\n", yytext);
   bool result = false;
   if (
-    token == CHARACTER_LITERAL ||
-    token == STRING_LITERAL ||
-    token == BOOLEAN_TRUE_VALUE ||
-    token == BOOLEAN_FALSE_VALUE ||
-    token == INTEGER_VALUE ||
-    token == FLOAT_VALUE
+    _token == CHARACTER_LITERAL ||
+    _token == STRING_LITERAL ||
+    _token == BOOLEAN_TRUE_VALUE ||
+    _token == BOOLEAN_FALSE_VALUE ||
+    _token == INTEGER_VALUE ||
+    _token == FLOAT_VALUE
   ) {
     result = true;
   }
@@ -236,10 +238,10 @@ bool _list_inst() {
       result = true;
     }
   } else if (
-    token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
-    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
+    _token == KEY_WORD_END || _token == KEY_WORD_ELSIF ||
+    _token == KEY_WORD_ELSE || _token == KEY_WORD_WHEN
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -250,10 +252,10 @@ bool _list_inst_aux() {
   if (_list_inst()) {
     result = true;
   } else if (
-    token == KEY_WORD_END || token == KEY_WORD_ELSIF ||
-    token == KEY_WORD_ELSE || token == KEY_WORD_WHEN
+    _token == KEY_WORD_END || _token == KEY_WORD_ELSIF ||
+    _token == KEY_WORD_ELSE || _token == KEY_WORD_WHEN
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -261,11 +263,11 @@ bool _list_inst_aux() {
 bool _if_statement() {
   if (DEBUG_MODE == true) printf("_if_statement() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_IF) {
+  if (_token == KEY_WORD_IF) {
     _read_token();
     if (_expression()) {
       _read_token();
-      if (token == KEY_WORD_THEN) {
+      if (_token == KEY_WORD_THEN) {
         _read_token();
         if (_list_inst()) {
           _read_token();
@@ -282,11 +284,11 @@ bool _if_statement() {
 bool _elsif_statement() {
   if (DEBUG_MODE == true) printf("_elsif_statement() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_ELSIF) {
+  if (_token == KEY_WORD_ELSIF) {
     _read_token();
     if (_expression()) {
       _read_token();
-      if (token == KEY_WORD_THEN) {
+      if (_token == KEY_WORD_THEN) {
         _read_token();
         if (_list_inst()) {
           _read_token();
@@ -296,7 +298,7 @@ bool _elsif_statement() {
         }
       }
     }
-  } else if (token == KEY_WORD_ELSE) {
+  } else if (_token == KEY_WORD_ELSE) {
     _read_token();
     if (_list_inst()) {
       _read_token();
@@ -313,11 +315,11 @@ bool _elsif_statement() {
 bool _endif_statement() {
   if (DEBUG_MODE == true) printf("_endif_statement() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_END) {
+  if (_token == KEY_WORD_END) {
     _read_token();
-    if (token == KEY_WORD_IF) {
+    if (_token == KEY_WORD_IF) {
       _read_token();
-      if (token == DELIMITER_SEMICOLON) {
+      if (_token == DELIMITER_SEMICOLON) {
         result = true;
       }
     }
@@ -340,27 +342,27 @@ bool _expression() {
 bool _expression_aux() {
   if (DEBUG_MODE == true) printf("_expression_aux() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_AND) {
+  if (_token == KEY_WORD_AND) {
     _read_token();
     if (_relation()) {
       result = true;
     }
-  } else if (token == KEY_WORD_XOR) {
+  } else if (_token == KEY_WORD_XOR) {
     _read_token();
     if (_relation()) {
       result = true;
     }
-  } else if (token == KEY_WORD_OR) {
+  } else if (_token == KEY_WORD_OR) {
     _read_token();
     if (_relation()) {
       result = true;
     }
   } else if (
-    token == KEY_WORD_THEN || token == DELIMITER_PAR_CLOSED || token == DELIMITER_FAT_ARROW || 
-    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON ||
-    token == KEY_WORD_LOOP
+    _token == KEY_WORD_THEN || _token == DELIMITER_PAR_CLOSED || _token == DELIMITER_FAT_ARROW || 
+    _token == KEY_WORD_IS || _token == DELIMITER_PIPE || _token == DELIMITER_SEMICOLON ||
+    _token == KEY_WORD_LOOP
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -380,43 +382,43 @@ bool _relation() {
 bool _relation_aux() {
   if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_EQUAL) {
+  if (_token == DELIMITER_EQUAL) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == DELIMITER_DIVIDE_EQUAL) {
+  } else if (_token == DELIMITER_DIVIDE_EQUAL) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == DELIMITER_LESS_THAN) {
+  } else if (_token == DELIMITER_LESS_THAN) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == DELIMITER_LESS_THAN_EQUAL) {
+  } else if (_token == DELIMITER_LESS_THAN_EQUAL) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == DELIMITER_GREATER_THAN) {
+  } else if (_token == DELIMITER_GREATER_THAN) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
-  } else if (token == DELIMITER_GREATER_THAN_EQUAL) {
+  } else if (_token == DELIMITER_GREATER_THAN_EQUAL) {
     _read_token();
     if (_simple_expression()) {
       result = true;
     }
   } else if (
-    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || 
-    token == KEY_WORD_XOR || token == DELIMITER_PAR_CLOSED || token == DELIMITER_FAT_ARROW || 
-    token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON ||
-    token == KEY_WORD_LOOP
+    _token == KEY_WORD_AND || _token == KEY_WORD_OR || _token == KEY_WORD_THEN || 
+    _token == KEY_WORD_XOR || _token == DELIMITER_PAR_CLOSED || _token == DELIMITER_FAT_ARROW || 
+    _token == KEY_WORD_IS || _token == DELIMITER_PIPE || _token == DELIMITER_SEMICOLON ||
+    _token == KEY_WORD_LOOP
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -424,7 +426,7 @@ bool _relation_aux() {
 bool _simple_expression() {
   if (DEBUG_MODE == true) printf("_simple_expression() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_PLUS) {
+  if (_token == DELIMITER_PLUS) {
     _read_token();
     if (_term()) {
       _read_token();
@@ -432,7 +434,7 @@ bool _simple_expression() {
         result = true;
       }
     }
-  } else if (token == DELIMITER_DASH) {
+  } else if (_token == DELIMITER_DASH) {
     _read_token();
     if (_term()) {
       _read_token();
@@ -452,7 +454,7 @@ bool _simple_expression() {
 bool _simple_expression_aux() {
   if (DEBUG_MODE == true) printf("_simple_expression_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_PLUS) {
+  if (_token == DELIMITER_PLUS) {
     _read_token();
     if (_term()) {
       _read_token();
@@ -460,7 +462,7 @@ bool _simple_expression_aux() {
         result = true;
       }
     }
-  } else if (token == DELIMITER_DASH) {
+  } else if (_token == DELIMITER_DASH) {
     _read_token();
     if (_term()) {
       _read_token();
@@ -468,7 +470,7 @@ bool _simple_expression_aux() {
         result = true;
       }
     }
-  } else if (token == DELIMITER_AND) {
+  } else if (_token == DELIMITER_AND) {
     _read_token();
     if (_term()) {
       _read_token();
@@ -477,14 +479,14 @@ bool _simple_expression_aux() {
       }
     }
   } else if (
-    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
-    token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
-    token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || 
-    token == DELIMITER_GREATER_THAN_EQUAL || token == DELIMITER_PAR_CLOSED ||
-    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || 
-    token == DELIMITER_SEMICOLON || token == KEY_WORD_LOOP
+    _token == KEY_WORD_AND || _token == KEY_WORD_OR || _token == KEY_WORD_THEN || _token == KEY_WORD_XOR ||
+    _token == DELIMITER_EQUAL || _token == DELIMITER_DIVIDE_EQUAL || _token == DELIMITER_LESS_THAN ||
+    _token == DELIMITER_LESS_THAN_EQUAL || _token == DELIMITER_GREATER_THAN || 
+    _token == DELIMITER_GREATER_THAN_EQUAL || _token == DELIMITER_PAR_CLOSED ||
+    _token == DELIMITER_FAT_ARROW || _token == KEY_WORD_IS || _token == DELIMITER_PIPE || 
+    _token == DELIMITER_SEMICOLON || _token == KEY_WORD_LOOP
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -504,7 +506,7 @@ bool _term() {
 bool _term_aux() {
   if (DEBUG_MODE == true) printf("_term_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_STAR) {
+  if (_token == DELIMITER_STAR) {
     _read_token();
     if (_factor()) {
       _read_token();
@@ -512,7 +514,7 @@ bool _term_aux() {
         result = true;
       }
     }
-  } else if (token == DELIMITER_SLASH) {
+  } else if (_token == DELIMITER_SLASH) {
     _read_token();
     if (_factor()) {
       _read_token();
@@ -520,7 +522,7 @@ bool _term_aux() {
         result = true;
       }
     }
-  } else if (token == KEY_WORD_MOD) {
+  } else if (_token == KEY_WORD_MOD) {
     _read_token();
     if (_factor()) {
       _read_token();
@@ -528,7 +530,7 @@ bool _term_aux() {
         result = true;
       }
     }
-  } else if (token == KEY_WORD_REM) {
+  } else if (_token == KEY_WORD_REM) {
     _read_token();
     if (_factor()) {
       _read_token();
@@ -537,13 +539,13 @@ bool _term_aux() {
       }
     }
   } else if (
-    token == KEY_WORD_AND || token == KEY_WORD_OR || token == KEY_WORD_THEN || token == KEY_WORD_XOR ||
-    token == DELIMITER_EQUAL || token == DELIMITER_DIVIDE_EQUAL || token == DELIMITER_LESS_THAN ||
-    token == DELIMITER_LESS_THAN_EQUAL || token == DELIMITER_GREATER_THAN || token == DELIMITER_GREATER_THAN_EQUAL ||
-    token == DELIMITER_PLUS || token == DELIMITER_DASH || token == DELIMITER_AND || token == DELIMITER_PAR_CLOSED ||
-    token == DELIMITER_FAT_ARROW || token == KEY_WORD_IS || token == DELIMITER_PIPE || token == DELIMITER_SEMICOLON
+    _token == KEY_WORD_AND || _token == KEY_WORD_OR || _token == KEY_WORD_THEN || _token == KEY_WORD_XOR ||
+    _token == DELIMITER_EQUAL || _token == DELIMITER_DIVIDE_EQUAL || _token == DELIMITER_LESS_THAN ||
+    _token == DELIMITER_LESS_THAN_EQUAL || _token == DELIMITER_GREATER_THAN || _token == DELIMITER_GREATER_THAN_EQUAL ||
+    _token == DELIMITER_PLUS || _token == DELIMITER_DASH || _token == DELIMITER_AND || _token == DELIMITER_PAR_CLOSED ||
+    _token == DELIMITER_FAT_ARROW || _token == KEY_WORD_IS || _token == DELIMITER_PIPE || _token == DELIMITER_SEMICOLON
   ) {
-    result = follow = true;
+    result = _follow = true;
   }
   return result;
 }
@@ -560,17 +562,20 @@ bool _factor() {
 bool _primary() {
   if (DEBUG_MODE == true) printf("_primary() : %s\n", yytext);
   bool result = false;
-  if (token == INTEGER_VALUE) {
+  if (_token == INTEGER_VALUE) {
     result = true;
-  } else if (token == FLOAT_VALUE) {
+  } else if (_token == FLOAT_VALUE) {
     result = true;
-  } else if (token == KEY_WORD_NULL) {
+  } else if (_token == KEY_WORD_NULL) {
     result = true;
-  } else if (token == STRING_LITERAL) {
+  } else if (_token == STRING_LITERAL) {
     result = true;
-  } else if (token == IDENTIFIER) {
+  } else if (_token == IDENTIFIER) {
+    if (_in_tab_symbol(yytext) == false) {
+      _add_semantic_error(NOT_DECLARED, yylineno, yytext);
+    }
     result = true;
-  } else if (token == DELIMITER_PAR_OPENED) {
+  } else if (_token == DELIMITER_PAR_OPENED) {
     _read_token();
     if (_expression()) {
       _read_token();
@@ -585,12 +590,11 @@ bool _primary() {
 bool _case_statement() {
   if (DEBUG_MODE == true) printf("_case_statement() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_CASE) {
-    puts("!");
+  if (_token == KEY_WORD_CASE) {
     _read_token();
     if (_expression()) {
       _read_token();
-      if (token == KEY_WORD_IS) {
+      if (_token == KEY_WORD_IS) {
         _read_token();
         if (_case_statement_alternative()) {
           _read_token();
@@ -607,11 +611,11 @@ bool _case_statement() {
 bool _case_statement_aux() {
   if (DEBUG_MODE == true) printf("_case_statement_aux() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_END) {
+  if (_token == KEY_WORD_END) {
     _read_token();
-    if (token == KEY_WORD_CASE) {
+    if (_token == KEY_WORD_CASE) {
       _read_token();
-      if (token == DELIMITER_SEMICOLON) {
+      if (_token == DELIMITER_SEMICOLON) {
         result = true;
       }
     }
@@ -627,11 +631,11 @@ bool _case_statement_aux() {
 bool _case_statement_alternative() {
   if (DEBUG_MODE == true) printf("_case_statement_alternative() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_WHEN) {
+  if (_token == KEY_WORD_WHEN) {
     _read_token();
     if (_choice_list()) {
       _read_token();
-      if (token == DELIMITER_FAT_ARROW) {
+      if (_token == DELIMITER_FAT_ARROW) {
         _read_token();
         if (_list_inst()) {
           result = true;
@@ -657,7 +661,7 @@ bool _choice_list() {
 bool _choice_list_aux() {
   if (DEBUG_MODE == true) printf("_choice_list_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_PIPE) {
+  if (_token == DELIMITER_PIPE) {
     _read_token();
     if (_choice()) {
       _read_token();
@@ -665,8 +669,8 @@ bool _choice_list_aux() {
         result = true;
       }
     }
-  } else if (token == DELIMITER_FAT_ARROW) {
-    result = follow = true;
+  } else if (_token == DELIMITER_FAT_ARROW) {
+    result = _follow = true;
   }
   return result;
 }
@@ -674,7 +678,7 @@ bool _choice_list_aux() {
 bool _choice() {
   if (DEBUG_MODE == true) printf("_choice() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_OTHERS) {
+  if (_token == KEY_WORD_OTHERS) {
     result = true;
   } else if (_expression()) {
     result = true;
@@ -685,7 +689,9 @@ bool _choice() {
 bool _identified_statement() {
   if (DEBUG_MODE == true) printf("_identified_statement() : %s\n", yytext);
   bool result = false;
-  if (token == IDENTIFIER) {
+  if (_token == IDENTIFIER) {
+    _current_var_name = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
+    strcpy(_current_var_name, yytext);
     _read_token();
     if (_identified_statement_aux()) {
       result = true;
@@ -708,11 +714,14 @@ bool _identified_statement_aux() {
 bool _sample_inst() {
   if (DEBUG_MODE == true) printf("_sample_inst() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_ASSIGN) {
+  if (_token == DELIMITER_ASSIGN) {
+    if (_in_tab_symbol(_current_var_name) == false) {
+      _add_semantic_error(NOT_DECLARED, yylineno, _current_var_name);
+    }
     _read_token();
     if (_expression()) {
       _read_token();
-      if (token == DELIMITER_SEMICOLON) {
+      if (_token == DELIMITER_SEMICOLON) {
         result = true;
       }
     }
@@ -723,7 +732,7 @@ bool _sample_inst() {
 bool _identified_loop_statement() {
   if (DEBUG_MODE == true) printf("_identified_loop_statement() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_PERIOD) {
+  if (_token == DELIMITER_PERIOD) {
     _read_token();
     if (_loop_statement()) {
       result = true;
@@ -735,7 +744,7 @@ bool _identified_loop_statement() {
 bool _loop_statement() {
   if (DEBUG_MODE == true) printf("_loop_statement() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_WHILE) {
+  if (_token == KEY_WORD_WHILE) {
     _read_token();
     if (_expression()) {
       _read_token();
@@ -752,13 +761,13 @@ bool _loop_statement() {
 bool _loop_statement_aux() {
   if (DEBUG_MODE == true) printf("_loop_statement_aux() : %s\n", yytext);
   bool result = false;
-  if (token == KEY_WORD_LOOP) {
+  if (_token == KEY_WORD_LOOP) {
     _read_token();
     if (_list_inst()) {
       _read_token();
       if (KEY_WORD_END) {
         _read_token();
-        if (token == KEY_WORD_LOOP) {
+        if (_token == KEY_WORD_LOOP) {
           _read_token();
           if (_loop_statement_aux_aux()) {
             result = true;
@@ -773,11 +782,11 @@ bool _loop_statement_aux() {
 bool _loop_statement_aux_aux() {
   if (DEBUG_MODE == true) printf("_loop_statement_aux_aux() : %s\n", yytext);
   bool result = false;
-  if (token == DELIMITER_SEMICOLON) {
+  if (_token == DELIMITER_SEMICOLON) {
     result = true;
-  } else if (token == IDENTIFIER) {
+  } else if (_token == IDENTIFIER) {
     _read_token();
-    if (token == DELIMITER_SEMICOLON) {
+    if (_token == DELIMITER_SEMICOLON) {
       result = true;
     }
   }

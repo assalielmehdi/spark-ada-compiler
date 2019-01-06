@@ -4,6 +4,7 @@
 typedef enum {
   ALREADY_DECLARED,
   BADLY_INITIALIZED,
+  NOT_DECLARED
 } _semantic_error_type;
 
 typedef struct {
