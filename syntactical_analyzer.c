@@ -3,7 +3,7 @@
 #include <string.h>
 #include "syntactical_analyzer.h"
 #include "tab_symb.h"
-#include "error.h"
+#include "errors.h"
 
 #define DEBUG_MODE false
 

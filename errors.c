@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "error.h"
+#include "errors.h"
 
 #define MAX_ERRORS 100
 
