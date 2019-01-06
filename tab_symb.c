@@ -40,21 +40,6 @@ bool _in_tab_symbol(char *name) {
   return result;
 }
 
-bool _check_value_type(_var_value_type value_type, _var_value value){
-  bool result = false;
-  if(value_type == VAR_VALUE_NUMBER && value.number_value == INTEGER_VALUE)
-    result = true;
-  else if(value_type == VAR_VALUE_NUMBER && value.number_value == FLOAT_VALUE)
-    result = true;
-  else if(value_type == VAR_VALUE_BOOLEAN && value.number_value == BOOLEAN_TRUE_VALUE || value.number_value == BOOLEAN_FALSE_VALUE)
-    result = true;
-  else if(value_type == VAR_VALUE_STRING && value.string_value == "STRING_LITERAL")
-    result = true;
-  else if(value_type == VAR_VALUE_CHARACTER && value.string_value == "CHARACTER_LITERAL")
-    result = true;
-  return result;
-}
-
 void _reset_tab_symbol() {
   memset(_tab_symbol, 0, sizeof(_tab_symbol));
   _var_count = 0;
@@ -67,6 +52,7 @@ void _print_tab_symbol() {
       printf(", ");
     }
     printf("{\n");
+    printf("  line: %d,\n", _tab_symbol[i]->line);
     printf("  name: %s,\n", _tab_symbol[i]->name);
     printf("  type: %s,\n", _tab_symbol[i]->type);
     printf("  initialized: %d", _tab_symbol[i]->initialized);
@@ -77,9 +63,11 @@ void _print_tab_symbol() {
           printf("  value: %s\n", _tab_symbol[i]->value.number_value == 1.0 ? "true" : "false");
           break;
         case VAR_VALUE_STRING:
+        case VAR_VALUE_CHARACTER:
           printf("  value: %s\n", _tab_symbol[i]->value.string_value);
           break;
-        case VAR_VALUE_NUMBER:
+        case VAR_VALUE_FLOAT:
+        case VAR_VALUE_INTEGER:
           printf("  value: %f\n", _tab_symbol[i]->value.number_value);
           break;
       }

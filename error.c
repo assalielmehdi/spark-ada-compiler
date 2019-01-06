@@ -12,7 +12,7 @@ _semantic_error *_create_semantic_error(_semantic_error_type type, int line, cha
   _semantic_error *e = (_semantic_error *) malloc(sizeof(_semantic_error));
   e->type = type;
   e->line = line;
-  e->name = (char *) malloc(strlen(name) + 1);
+  e->name = (char *) malloc((strlen(name) + 1) * sizeof(char));
   strcpy(e->name, name);
   return e;
 }
@@ -34,7 +34,7 @@ void _show_semantic_error(_semantic_error *error) {
 }
 
 void _show_semantic_errors() {
-  for(int i = 0; i < _errors_count; i++) {
+  for (int i = 0; i < _errors_count; i++) {
 		_show_semantic_error(_errors[i]);
 	}
 }

@@ -5,7 +5,7 @@ test2:Float :=50.1;
 test2:Character :='A';
 test2:String :="OMG";
 test2:Boolean :=true;
-test2:Boolean :=false;
+test2:Boolean := "Hi";
 
 test3:Integer;
 test3:Float;

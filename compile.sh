@@ -8,14 +8,15 @@
 # How to use ?
 #   1. Make sure the script has execution permission (+x)
 #   2. run the following command: 
-# ./compile.sh <my_flex_file.lex> <my_syntactic_analyzer_file.c> <my_tab_symbol_file.c> <my_executable_file_name>
+# ./compile.sh <my_flex_file.lex> <my_syntactic_analyzer_file.c> <my_tab_symbol_file.c> <my_errors_file.c> <my_executable_file_name>
 
 flex "$1"
 gcc -c lex.yy.c
 gcc -c "$2"
 gcc -c "$3"
+gcc -c "$4"
 file_name1=$(echo "$2" | cut -d '.' -f 1)
 file_name2=$(echo "$3" | cut -d '.' -f 1)
-#file_name3=$(echo "$4" | cut -d '.' -f 1)
-gcc -o "$4" lex.yy.o "$file_name1.o" "$file_name2.o" 
+file_name3=$(echo "$4" | cut -d '.' -f 1)
+gcc -o "$5" lex.yy.o "$file_name1.o" "$file_name2.o" "$file_name3.o"
 rm lex.yy.c *.o

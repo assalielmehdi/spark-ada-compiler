@@ -108,6 +108,17 @@ bool _decl_aux() {
     var->type = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
     strcpy(var->type, yytext);
     var->line = yylineno;
+    if (strcmp(yytext, "Integer") == 0) {
+      var->value_type = VAR_VALUE_INTEGER;
+    }  else if (strcmp(yytext, "Float") == 0) {
+      var->value_type = VAR_VALUE_FLOAT;
+    } else if (strcmp(yytext, "Boolean") == 0) {
+      var->value_type = VAR_VALUE_BOOLEAN;
+    } else if (strcmp(yytext, "String") == 0) {
+      var->value_type = VAR_VALUE_STRING;
+    } else if (strcmp(yytext, "Character") == 0) {
+      var->value_type = VAR_VALUE_CHARACTER;
+    }
     if (DEBUG_MODE == true) printf("var_type: %s\n", var->type);
     _read_token();
     if (_decl_aux_aux()) {
@@ -133,31 +144,19 @@ bool _decl_aux_aux() {
     if (DEBUG_MODE == true) printf("var_initialized: %d\n", var->initialized);
     _read_token();
     if (_const()) {
-      if (token == STRING_LITERAL || token == CHARACTER_LITERAL) {
-        var->value.string_value = (char *) malloc((strlen(yytext) - 1) * sizeof(char));
-        strncpy(var->value.string_value, yytext + 1, strlen(yytext) - 2);
-        var->value_type = VAR_VALUE_STRING;
-        if (DEBUG_MODE == true) printf("var_value: %s\n", var->value.string_value);
-      } else if (token == BOOLEAN_TRUE_VALUE) {
-        var->value.number_value = 1.0;
-        var->value_type = VAR_VALUE_BOOLEAN;
-        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
-      } else if (token == BOOLEAN_FALSE_VALUE) {
-        var->value.number_value = 0.0;
-        var->value_type = VAR_VALUE_BOOLEAN;
-        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
-      } else {
-        var->value.number_value = (float) atof(yytext);
-        var->value_type = VAR_VALUE_NUMBER;
-        if (DEBUG_MODE == true) printf("var_value: %f\n", var->value.number_value);
-      } 
+      if (
+        (token == CHARACTER_LITERAL && var->value_type != VAR_VALUE_CHARACTER) ||
+        (token == STRING_LITERAL && var->value_type != VAR_VALUE_STRING) ||
+        (token == INTEGER_VALUE && var->value_type != VAR_VALUE_INTEGER) ||
+        (token == FLOAT_VALUE && var->value_type != VAR_VALUE_FLOAT) ||
+        ((token == BOOLEAN_TRUE_VALUE || token == BOOLEAN_FALSE_VALUE) && var->value_type != VAR_VALUE_BOOLEAN)
+      ) {
+        _add_semantic_error(BADLY_INITIALIZED, var->line, var->name);
+      }
       _read_token();
       if (token == DELIMITER_SEMICOLON) {
         if (_add_var_to_tab_symbol(var) == false) {
-          _add_semantic_error(ALREADY_DECLARED,var->line,var->name);
-        };
-        if(_check_value_type(var->value_type,var->value) == false){
-          _add_semantic_error(BADLY_INITIALIZED,var->line,var->name);
+          _add_semantic_error(ALREADY_DECLARED, var->line, var->name);
         };
         result = true;
       }
@@ -165,7 +164,7 @@ bool _decl_aux_aux() {
   } else if (token == DELIMITER_SEMICOLON) {
     var->initialized = false;
     if (_add_var_to_tab_symbol(var) == false) {
-      _add_semantic_error(ALREADY_DECLARED,var->line,var->name);
+      _add_semantic_error(ALREADY_DECLARED, var->line, var->name);
     };
     result = true;
   }
