@@ -3,6 +3,7 @@
 #include <string.h>
 #include "syntactical_analyzer.h"
 #include "tab_symb.h"
+#include "error.h"
 
 #define DEBUG_MODE false
 
@@ -23,6 +24,7 @@ int main() {
     puts("--------------------");
     _print_tab_symbol();
   }
+  _show_semantic_errors();
   return 0;
 }
 
@@ -104,6 +106,7 @@ bool _decl_aux() {
   if (_type()) {
     var->type = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
     strcpy(var->type, yytext);
+    var->line = yylineno;
     if (DEBUG_MODE == true) printf("var_type: %s\n", var->type);
     _read_token();
     if (_decl_aux_aux()) {
@@ -158,7 +161,7 @@ bool _decl_aux_aux() {
   } else if (token == DELIMITER_SEMICOLON) {
     var->initialized = false;
     if (_add_var_to_tab_symbol(var) == false) {
-      printf("Variable already declared\n");
+      _add_semantic_error(ALREADY_DECLARED,var->line,var->name);
     };
     result = true;
   }

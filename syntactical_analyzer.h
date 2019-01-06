@@ -117,6 +117,8 @@ extern int yylex();
 
 extern char *yytext;
 
+extern int yylineno;
+
 void _read_token();
 
 bool _proc();
