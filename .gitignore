@@ -1,1 +1,4 @@
 lex.yy.c
+main
+out
+compile.sh
