@@ -40,6 +40,12 @@ bool _in_tab_symbol(char *name) {
   return result;
 }
 
+bool _var_initialized(char *name) {
+  int i = 0;
+  while (strcmp(_tab_symbol[i]->name, name) != 0) i++;
+  return _tab_symbol[i]->initialized;
+}
+
 void _reset_tab_symbol() {
   memset(_tab_symbol, 0, sizeof(_tab_symbol));
   _var_count = 0;

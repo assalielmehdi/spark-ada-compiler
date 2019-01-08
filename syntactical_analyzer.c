@@ -573,6 +573,8 @@ bool _primary() {
   } else if (_token == IDENTIFIER) {
     if (_in_tab_symbol(yytext) == false) {
       _add_semantic_error(NOT_DECLARED, yylineno, yytext);
+    } else if (_var_initialized(yytext) == false) {
+      _add_semantic_error(NOT_INITIALIZED, yylineno, yytext);
     }
     result = true;
   } else if (_token == DELIMITER_PAR_OPENED) {

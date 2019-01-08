@@ -33,6 +33,9 @@ void _show_semantic_error(_semantic_error *error) {
     case NOT_DECLARED:
       printf("Not Declared\n");
       break;
+    case NOT_INITIALIZED:
+      printf("Not Initialized\n");
+      break;
   }
 }
 
