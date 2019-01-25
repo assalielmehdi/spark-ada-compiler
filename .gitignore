@@ -1,4 +1,2 @@
-lex.yy.c
-main
-out
 .vscode
+target
