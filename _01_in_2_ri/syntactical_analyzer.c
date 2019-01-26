@@ -4,6 +4,7 @@
 #include "syntactical_analyzer.h"
 #include "tab_symb.h"
 #include "errors.h"
+#include "ast.h"
 
 #define DEBUG_MODE false
 
@@ -265,7 +266,8 @@ bool _if_statement() {
   bool result = false;
   if (_token == KEY_WORD_IF) {
     _read_token();
-    if (_expression()) {
+    _ast *_past = (_ast *) malloc(sizeof(_ast));
+    if (_expression(_past)) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
         _read_token();
@@ -327,34 +329,34 @@ bool _endif_statement() {
   return result;
 }
 
-bool _expression() {
+bool _expression(_ast *_past) {
   if (DEBUG_MODE == true) printf("_expression() : %s\n", yytext);
   bool result = false;
-  if (_relation()) {
+  if (_relation(_past)) {
     _read_token();
-    if (_expression_aux()) {
+    if (_expression_aux(_past)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _expression_aux() {
+bool _expression_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_expression_aux() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_AND) {
     _read_token();
-    if (_relation()) {
+    if (_relation(_past)) {
       result = true;
     }
   } else if (_token == KEY_WORD_XOR) {
     _read_token();
-    if (_relation()) {
+    if (_relation(_past)) {
       result = true;
     }
   } else if (_token == KEY_WORD_OR) {
     _read_token();
-    if (_relation()) {
+    if (_relation(_past)) {
       result = true;
     }
   } else if (
@@ -367,49 +369,49 @@ bool _expression_aux() {
   return result;
 }
 
-bool _relation() {
+bool _relation(_ast *_past) {
   if (DEBUG_MODE == true) printf("_relation() : %s\n", yytext);
   bool result = false;
-  if (_simple_expression()) {
+  if (_simple_expression(_past)) {
     _read_token();
-    if (_relation_aux()) {
+    if (_relation_aux(_past)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _relation_aux() {
+bool _relation_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_EQUAL) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (_token == DELIMITER_DIVIDE_EQUAL) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (_token == DELIMITER_LESS_THAN) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (_token == DELIMITER_LESS_THAN_EQUAL) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (_token == DELIMITER_GREATER_THAN) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (_token == DELIMITER_GREATER_THAN_EQUAL) {
     _read_token();
-    if (_simple_expression()) {
+    if (_simple_expression(_past)) {
       result = true;
     }
   } else if (
@@ -423,58 +425,58 @@ bool _relation_aux() {
   return result;
 }
 
-bool _simple_expression() {
+bool _simple_expression(_ast *_past) {
   if (DEBUG_MODE == true) printf("_simple_expression() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_PLUS) {
     _read_token();
-    if (_term()) {
+    if (_term(_past)) {
       _read_token();
-      if (_simple_expression_aux()) {
+      if (_simple_expression_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == DELIMITER_DASH) {
     _read_token();
-    if (_term()) {
+    if (_term(_past)) {
       _read_token();
-      if (_simple_expression_aux()) {
+      if (_simple_expression_aux(_past)) {
         result = true;
       }
     }
-  } else if (_term()) {
+  } else if (_term(_past)) {
     _read_token();
-    if (_simple_expression_aux()) {
+    if (_simple_expression_aux(_past)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _simple_expression_aux() {
+bool _simple_expression_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_simple_expression_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_PLUS) {
     _read_token();
-    if (_term()) {
+    if (_term(_past)) {
       _read_token();
-      if (_simple_expression_aux()) {
+      if (_simple_expression_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == DELIMITER_DASH) {
     _read_token();
-    if (_term()) {
+    if (_term(_past)) {
       _read_token();
-      if (_simple_expression_aux()) {
+      if (_simple_expression_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == DELIMITER_AND) {
     _read_token();
-    if (_term()) {
+    if (_term(_past)) {
       _read_token();
-      if (_simple_expression_aux()) {
+      if (_simple_expression_aux(_past)) {
         result = true;
       }
     }
@@ -491,50 +493,50 @@ bool _simple_expression_aux() {
   return result;
 }
 
-bool _term() {
+bool _term(_ast *_past) {
   if (DEBUG_MODE == true) printf("_term() : %s\n", yytext);
   bool result = false;
-  if (_factor()) {
+  if (_factor(_past)) {
     _read_token();
-    if (_term_aux()) {
+    if (_term_aux(_past)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _term_aux() {
+bool _term_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_term_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_STAR) {
     _read_token();
-    if (_factor()) {
+    if (_factor(_past)) {
       _read_token();
-      if (_term_aux()) {
+      if (_term_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == DELIMITER_SLASH) {
     _read_token();
-    if (_factor()) {
+    if (_factor(_past)) {
       _read_token();
-      if (_term_aux()) {
+      if (_term_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == KEY_WORD_MOD) {
     _read_token();
-    if (_factor()) {
+    if (_factor(_past)) {
       _read_token();
-      if (_term_aux()) {
+      if (_term_aux(_past)) {
         result = true;
       }
     }
   } else if (_token == KEY_WORD_REM) {
     _read_token();
-    if (_factor()) {
+    if (_factor(_past)) {
       _read_token();
-      if (_term_aux()) {
+      if (_term_aux(_past)) {
         result = true;
       }
     }
@@ -550,16 +552,16 @@ bool _term_aux() {
   return result;
 }
 
-bool _factor() {
+bool _factor(_ast *_past) {
   if (DEBUG_MODE == true) printf("_factor() : %s\n", yytext);
   bool result = false;
-  if (_primary()) {
+  if (_primary(_past)) {
     result = true;
   }
   return result;
 }
 
-bool _primary() {
+bool _primary(_ast *_past) {
   if (DEBUG_MODE == true) printf("_primary() : %s\n", yytext);
   bool result = false;
   if (_token == INTEGER_VALUE) {
@@ -579,7 +581,7 @@ bool _primary() {
     result = true;
   } else if (_token == DELIMITER_PAR_OPENED) {
     _read_token();
-    if (_expression()) {
+    if (_expression(_past)) {
       _read_token();
       if (DELIMITER_PAR_CLOSED) {
         result = true;
@@ -594,7 +596,8 @@ bool _case_statement() {
   bool result = false;
   if (_token == KEY_WORD_CASE) {
     _read_token();
-    if (_expression()) {
+    _ast *_past = (_ast *) malloc(sizeof(_ast));
+    if (_expression(_past)) {
       _read_token();
       if (_token == KEY_WORD_IS) {
         _read_token();
@@ -680,9 +683,10 @@ bool _choice_list_aux() {
 bool _choice() {
   if (DEBUG_MODE == true) printf("_choice() : %s\n", yytext);
   bool result = false;
+  _ast *_past = (_ast *) malloc(sizeof(_ast));
   if (_token == KEY_WORD_OTHERS) {
     result = true;
-  } else if (_expression()) {
+  } else if (_expression(_past)) {
     result = true;
   }
   return result;
@@ -721,7 +725,8 @@ bool _sample_inst() {
       _add_semantic_error(NOT_DECLARED, yylineno, _current_var_name);
     }
     _read_token();
-    if (_expression()) {
+    _ast *_past = (_ast *) malloc(sizeof(_ast));
+    if (_expression(_past)) {
       _read_token();
       if (_token == DELIMITER_SEMICOLON) {
         result = true;
@@ -748,7 +753,8 @@ bool _loop_statement() {
   bool result = false;
   if (_token == KEY_WORD_WHILE) {
     _read_token();
-    if (_expression()) {
+    _ast *_past = (_ast *) malloc(sizeof(_ast));
+    if (_expression(_past)) {
       _read_token();
       if (_loop_statement_aux()) {
         result = true;

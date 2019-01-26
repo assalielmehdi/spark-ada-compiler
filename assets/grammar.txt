@@ -11,7 +11,7 @@ Decl [DONE] {
 }
 
 Decl_aux [DONE] {
-  Type Decl_aux_aux
+  Type Decl_aux_aux,
   'constant' Type Decl_aux_aux
 }
 
