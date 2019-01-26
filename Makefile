@@ -6,9 +6,9 @@ PC_2_OUT_DIR := ${BASE_DIR}/_03_pc_2_out
 
 all: in_to_ri
 
-in_to_ri: lexical_analyzer symbols_table errors syntactical_analyzer
+in_to_ri: lexical_analyzer ast symbols_table errors syntactical_analyzer
 	cd ${IN_2_RI_DIR}; \
-	gcc -o main lex.yy.o syntactical_analyzer.o errors.o tab_symb.o; \
+	gcc -o main lex.yy.o syntactical_analyzer.o errors.o tab_symb.o ast.o; \
 	mv main ${TARGET_DIR}/main
 
 lexical_analyzer:
@@ -27,6 +27,10 @@ errors:
 syntactical_analyzer:
 	cd ${IN_2_RI_DIR}; \
 	gcc -c syntactical_analyzer.c
+
+ast:
+	cd ${IN_2_RI_DIR}; \
+	gcc -c ast.c
 
 clean:
 	rm ${IN_2_RI_DIR}/lex.yy.c
