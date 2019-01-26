@@ -288,7 +288,8 @@ bool _elsif_statement() {
   bool result = false;
   if (_token == KEY_WORD_ELSIF) {
     _read_token();
-    if (_expression()) {
+    _ast *_past = (_ast *) malloc(sizeof(_ast));
+    if (_expression(_past)) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
         _read_token();
@@ -385,33 +386,51 @@ bool _relation_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_EQUAL) {
+    *_past = _ast_create_operation_node(OPERATION_EQUAL, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == DELIMITER_DIVIDE_EQUAL) {
+    *_past = _ast_create_operation_node(OPERATION_NOT_EQUAL, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == DELIMITER_LESS_THAN) {
+    *_past = _ast_create_operation_node(OPERATION_LESS_THAN, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == DELIMITER_LESS_THAN_EQUAL) {
+    *_past = _ast_create_operation_node(OPERATION_LESS_THAN_EQUAL, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == DELIMITER_GREATER_THAN) {
+    *_past = _ast_create_operation_node(OPERATION_GREATER_THAN, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == DELIMITER_GREATER_THAN_EQUAL) {
+    *_past = _ast_create_operation_node(OPERATION_GREATER_THAN_EQUAL, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_simple_expression(_past)) {
+    if (_simple_expression(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (
@@ -457,18 +476,24 @@ bool _simple_expression_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_simple_expression_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_PLUS) {
+    *_past = _ast_create_operation_node(OPERATION_PLUS, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_term(_past)) {
+    if (_term(_right)) {
       _read_token();
-      if (_simple_expression_aux(_past)) {
+      if (_simple_expression_aux(_right)) {
+        (*_past)->value.operation.right = *_right;
         result = true;
       }
     }
   } else if (_token == DELIMITER_DASH) {
+    *_past = _ast_create_operation_node(OPERATION_MINUS, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_term(_past)) {
+    if (_term(_right)) {
       _read_token();
-      if (_simple_expression_aux(_past)) {
+      if (_simple_expression_aux(_right)) {
+        (*_past)->value.operation.right = *_right;
         result = true;
       }
     }
@@ -509,18 +534,24 @@ bool _term_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_term_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_STAR) {
+    *_past = _ast_create_operation_node(OPERATION_MULT, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_factor(_past)) {
+    if (_factor(_right)) {
       _read_token();
-      if (_term_aux(_past)) {
+      if (_term_aux(_right)) {
+        (*_past)->value.operation.right = *_right;
         result = true;
       }
     }
   } else if (_token == DELIMITER_SLASH) {
+    *_past = _ast_create_operation_node(OPERATION_DIV, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_factor(_past)) {
+    if (_factor(_right)) {
       _read_token();
-      if (_term_aux(_past)) {
+      if (_term_aux(_right)) {
+        (*_past)->value.operation.right = *_right;
         result = true;
       }
     }
@@ -565,8 +596,10 @@ bool _primary(_ast *_past) {
   if (DEBUG_MODE == true) printf("_primary() : %s\n", yytext);
   bool result = false;
   if (_token == INTEGER_VALUE) {
+    *_past = _ast_create_constant_node(NODE_CONSTANT_INT, atof(yytext));
     result = true;
   } else if (_token == FLOAT_VALUE) {
+    *_past = _ast_create_constant_node(NODE_CONSTANT_DOUBLE, atof(yytext));
     result = true;
   } else if (_token == KEY_WORD_NULL) {
     result = true;
@@ -577,6 +610,8 @@ bool _primary(_ast *_past) {
       _add_semantic_error(NOT_DECLARED, yylineno, yytext);
     } else if (_var_initialized(yytext) == false) {
       _add_semantic_error(NOT_INITIALIZED, yylineno, yytext);
+    } else {
+      *_past = _ast_create_variable_node(yytext);
     }
     result = true;
   } else if (_token == DELIMITER_PAR_OPENED) {
