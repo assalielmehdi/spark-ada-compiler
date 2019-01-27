@@ -61,4 +61,8 @@ _ast _ast_create_variable_node(char *name);
 
 _ast _ast_create_operation_node(_operation_type type, _ast left, _ast right);
 
+void _ast_print_infix(_ast root);
+
+void _ast_print_postfix(_ast root);
+
 #endif

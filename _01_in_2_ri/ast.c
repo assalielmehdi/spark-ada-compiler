@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ast.h"
@@ -25,4 +26,67 @@ _ast _ast_create_operation_node(_operation_type type, _ast left, _ast right) {
   node->value.operation.left = left;
   node->value.operation.right = right;
   return node;
+}
+
+void _ast_print_operation(_operation_type type) {
+  switch (type) {
+    case OPERATION_DIV:
+      printf("/ ");
+      break;
+    case OPERATION_EQUAL:
+      printf("= ");
+      break;
+    case OPERATION_GREATER_THAN:
+      printf("> ");
+      break;
+    case OPERATION_GREATER_THAN_EQUAL:
+      printf(">= ");
+      break;
+    case OPERATION_LESS_THAN:
+      printf("< ");
+      break;
+    case OPERATION_LESS_THAN_EQUAL:
+      printf("<= ");
+      break;
+    case OPERATION_MINUS:
+      printf("- ");
+      break;
+    case OPERATION_MULT:
+      printf("* ");
+      break;
+    case OPERATION_NOT_EQUAL:
+      printf("/= ");
+      break;
+    case OPERATION_PLUS:
+      printf("+ ");
+      break;
+  }
+}
+
+void _ast_print_infix(_ast root) {
+  if (root != NULL) {
+    if (root->type == NODE_CONSTANT) {
+      printf("%lf ", root->value.constant.value);
+    } else if (root->type == NODE_VARIABLE) {
+      printf("%s ", root->value.variable.name);
+    } else {
+      _ast_print_infix(root->value.operation.left);
+      _ast_print_operation(root->value.operation.type);
+      _ast_print_infix(root->value.operation.right);
+    }
+  }
+}
+
+void _ast_print_postfix(_ast root) {
+  if (root != NULL) {
+    if (root->type == NODE_CONSTANT) {
+      printf("%lf ", root->value.constant.value);
+    } else if (root->type == NODE_VARIABLE) {
+      printf("%s ", root->value.variable.name);
+    } else {
+      _ast_print_postfix(root->value.operation.left);
+      _ast_print_postfix(root->value.operation.right);
+      _ast_print_operation(root->value.operation.type);
+    }
+  }
 }

@@ -269,6 +269,10 @@ bool _if_statement() {
     _ast *_past = (_ast *) malloc(sizeof(_ast));
     if (_expression(_past)) {
       _read_token();
+      _ast_print_infix(*_past);
+      puts("");
+      _ast_print_postfix(*_past);
+      puts("");
       if (_token == KEY_WORD_THEN) {
         _read_token();
         if (_list_inst()) {
