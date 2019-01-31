@@ -9,6 +9,7 @@ all: compile clean
 compile: in_to_ri pc_to_out
 
 # Compile files in _01_in_2_ri directory
+# Output file is 'compiler' in target directory
 
 in_to_ri: lexical_analyzer ast symbols_table errors syntactical_analyzer
 	cd ${IN_2_RI_DIR}; \
@@ -39,6 +40,7 @@ ast:
 # ----------------------------------------------
 
 # Compile files in _03_pc_2_out directory
+# Output file is 'interpreter' in target directory
 
 pc_to_out: pseudo_code_lex stack pseudo_code interpreter
 	cd ${PC_2_OUT_DIR}; \

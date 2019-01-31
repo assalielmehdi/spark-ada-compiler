@@ -10,13 +10,20 @@ _pc_token_type _token;
 
 bool _follow = false;
 
+_pc_code *_pseudo_code;
+
+_interpreter_data _data;
+
 int main(int argc, char **argv) {
+  _pseudo_code = _pc_init();
+  _data = _interpreter_data_init();
   _interpreter_read_token();
   if (_interpreter_pseudo_code()) {
     puts("OK");
   } else {
     puts("NOK");
   }
+  _pc_print_code(*_pseudo_code);
   return EXIT_SUCCESS;
 }
 
@@ -26,6 +33,30 @@ void _interpreter_read_token() {
   } else {
     _token = (_pc_token_type) yylex();
   }
+}
+
+_interpreter_data _interpreter_data_init() {
+  return NULL;
+}
+
+_interpreter_data _interpreter_add_variable(_interpreter_data data, char *name, double value) {
+  _interpreter_data_node *node = (_interpreter_data_node *) malloc(sizeof(_interpreter_data_node));
+  node->variable.name = (char *) malloc((1 + strlen(name)) * sizeof(char));
+  strcpy(node->variable.name, name);
+  node->variable.value = value;
+  node->next = data;
+  return node;
+}
+
+_interpreter_variable _interpreter_get_variable(_interpreter_data data, char *name) {
+  _interpreter_data_node *cur = data;
+  while (cur != NULL) {
+    if (strcmp(cur->variable.name, name) == 0) {
+      break;
+    }
+    cur = cur->next;
+  }
+  return cur->variable;
 }
 
 bool _interpreter_pseudo_code() {
