@@ -143,6 +143,7 @@ Primary [UNCOMPLETED] {
   String_literal,
   Integer_value,
   Float_value,
+  Boolean_value
   '(' Expression ')'
 }
 

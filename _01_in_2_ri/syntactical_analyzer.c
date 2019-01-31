@@ -607,6 +607,12 @@ bool _primary(_ast *_past) {
   } else if (_token == FLOAT_VALUE) {
     *_past = _ast_create_constant_node(NODE_CONSTANT_DOUBLE, atof(yytext));
     result = true;
+  } else if (_token == BOOLEAN_TRUE_VALUE) {
+    *_past = _ast_create_constant_node(NODE_CONSTANT_BOOL, 1.0);
+    result = true;
+  }  else if (_token == BOOLEAN_FALSE_VALUE) {
+    *_past = _ast_create_constant_node(NODE_CONSTANT_BOOL, 0.0);
+    result = true;
   } else if (_token == KEY_WORD_NULL) {
     result = true;
   } else if (_token == STRING_LITERAL) {
