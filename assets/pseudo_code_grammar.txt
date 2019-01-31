@@ -1,0 +1,51 @@
+PC {
+  List_decl "begin:" List_inst "end:"
+}
+
+List_decl {
+  "DATA" Identifier Number List_decl_aux
+}
+
+List_decl_aux {
+  List_decl,
+  _epsilon,
+  FOLLOW = {"begin:"}
+}
+
+List_inst {
+  Inst List_inst_aux
+}
+
+List_inst_aux {
+  List_inst,
+  _epsilon,
+  FOLLOW = {"end:"}
+}
+
+Inst {
+  Begin_label,
+  End_label,
+  "DATA" 
+  "LOAD" Identifier,
+  "PUSH" Number,
+  "STORE" Identifier,
+  "ADD",
+  "SUB",
+  "MULT", 
+  "DIV",
+  "MOD",
+  "JMP" Jump_label,
+  "JT" Jump_label,
+  "JF" Jump_label
+  "EVAL_G",
+  "EVAL_GE", 
+  "EVAL_L",
+  "EVAL_LE", 
+  "EVAL_E",
+  "EVAL_NE" 
+}
+
+Jump_label {
+  Begin_label,
+  End_label
+}

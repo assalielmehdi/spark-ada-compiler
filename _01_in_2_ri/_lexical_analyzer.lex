@@ -3,9 +3,7 @@
 %option yylineno
 
 %{
-#ifndef SYNTACTICAL_ANALYZER
 #include "syntactical_analyzer.h"
-#endif
 %}
 
 INTEGER   ([+-]?[0-9]+)|([+-]?[0-9]{1,3}("_"[0-9]{3})*)

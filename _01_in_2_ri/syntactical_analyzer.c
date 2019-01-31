@@ -16,7 +16,7 @@ _var_info *_var = NULL;
 
 char *_current_var_name = NULL;
 
-int main() {
+int main(int argc, char **argv) {
   _reset_tab_symbol();
   _read_token();
   if (_proc()) {
@@ -34,7 +34,7 @@ int main() {
   puts("--------------------");
   puts("Errors:");
   _show_semantic_errors();
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void _read_token() {

@@ -1,0 +1,19 @@
+DATA fact 1
+DATA n 1
+begin:
+begin_0:
+LOAD n
+PUSH 0
+EVAL_G
+TF end_0:
+LOAD fact
+LOAD n
+MULT
+STORE fact
+LOAD n
+PUSH 1
+SUB
+STORE n
+JMP begin_0:
+end_0:
+end:
