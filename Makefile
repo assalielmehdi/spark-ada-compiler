@@ -40,15 +40,19 @@ ast:
 
 # Compile files in _03_pc_2_out directory
 
-pc_to_out: pseudo_code_lex pseudo_code interpreter
+pc_to_out: pseudo_code_lex stack pseudo_code interpreter
 	cd ${PC_2_OUT_DIR}; \
-	gcc -o interpreter lex.yy.o interpreter.o pseudo_code.o; \
+	gcc -o interpreter lex.yy.o interpreter.o pseudo_code.o stack.o; \
 	mv interpreter ${TARGET_DIR}/interpreter
 
 pseudo_code_lex:
 	cd ${PC_2_OUT_DIR}; \
 	flex _pseudo_code.lex; \
 	gcc -c lex.yy.c
+
+stack:
+	cd ${PC_2_OUT_DIR}; \
+	gcc -c stack.c
 
 pseudo_code:
 	cd ${PC_2_OUT_DIR}; \
@@ -62,7 +66,7 @@ interpreter:
 
 clean: clean_in_to_ri clean_pc_to_out
 
-# Compile files in _01_in_2_ri directory
+# Clean _01_in_2_ri directory
 
 clean_in_to_ri:
 	rm ${IN_2_RI_DIR}/lex.yy.c
@@ -70,7 +74,7 @@ clean_in_to_ri:
 
 # ---------------------------------------
 
-# Compile files in _03_pc_2_out directory
+# Clean _03_pc_2_out directory
 
 clean_pc_to_out:
 	rm ${PC_2_OUT_DIR}/lex.yy.c
