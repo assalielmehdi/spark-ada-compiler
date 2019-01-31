@@ -65,14 +65,19 @@ typedef struct {
 } _pc_instruction;
 
 typedef struct _pc_node {
-  _pc_instruction *instruction;
+  _pc_instruction instruction;
   struct _pc_node *next;
 } _pc_node;
 
-typedef _pc_node *_pc_code;
+typedef struct {
+  _pc_node *first;
+  _pc_node *last;
+} _pc_code;
 
-_pc_code _pc_init();
+_pc_code *_pc_init();
 
-_pc_code _pc_add_instruction(_pc_instruction_code code, _pc_instruction_param param);
+void _pc_add_instruction(_pc_code *pc_code, _pc_instruction_code code, _pc_instruction_param param);
+
+void _pc_print_code(_pc_code pc_code);
 
 #endif
