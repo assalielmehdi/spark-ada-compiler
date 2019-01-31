@@ -25,7 +25,7 @@ List_inst_aux {
 Inst {
   Begin_label,
   End_label,
-  "DATA" 
+  "DATA" Identifier Number,
   "LOAD" Identifier,
   "PUSH" Number,
   "STORE" Identifier,

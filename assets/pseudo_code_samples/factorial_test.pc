@@ -5,7 +5,7 @@ begin_0:
 LOAD n
 PUSH 0
 EVAL_G
-TF end_0:
+JF end_0:
 LOAD fact
 LOAD n
 MULT

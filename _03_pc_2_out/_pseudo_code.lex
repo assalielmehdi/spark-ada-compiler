@@ -7,7 +7,7 @@
 %}
 
 INTEGER [+-]?[0-9]+
-NUMBER {INTEGER}"."{INTEGER}
+NUMBER {INTEGER}("."{INTEGER})?
 
 %%
 
@@ -29,7 +29,7 @@ NUMBER {INTEGER}"."{INTEGER}
 "EVAL_L" return PC_KEY_WORD_EVAL_L;
 "EVAL_LE" return PC_KEY_WORD_EVAL_LE;
 "EVAL_E" return PC_KEY_WORD_EVAL_E;
-"EVAL_NE" return PC_KEY_WORD_NE;
+"EVAL_NE" return PC_KEY_WORD_EVAL_E;
 "begin:" return PC_KEY_WORD_BEGIN;
 "end:" return PC_KEY_WORD_END;
 "begin_"{INTEGER}":" return PC_LABEL_BEGIN;
