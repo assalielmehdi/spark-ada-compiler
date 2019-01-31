@@ -4,7 +4,9 @@ IN_2_RI_DIR := ${BASE_DIR}/_01_in_2_ri
 RI_2_PC_DIR := ${BASE_DIR}/_02_ri_2_pc
 PC_2_OUT_DIR := ${BASE_DIR}/_03_pc_2_out
 
-all: in_to_ri
+all: compile clean
+
+compile: in_to_ri
 
 in_to_ri: lexical_analyzer ast symbols_table errors syntactical_analyzer
 	cd ${IN_2_RI_DIR}; \

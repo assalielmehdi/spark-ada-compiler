@@ -20,14 +20,19 @@ int main() {
   _reset_tab_symbol();
   _read_token();
   if (_proc()) {
-    puts("OK");
+    puts("--------------------");
+    puts("Program syntactically correct");
   } else {
-    puts("NOK");
+    puts("--------------------");
+    puts("Program syntactically incorrect");
   }
   if (DEBUG_MODE == true) {
     puts("--------------------");
+    puts("Sym Table:");
     _print_tab_symbol();
   }
+  puts("--------------------");
+  puts("Errors:");
   _show_semantic_errors();
   return 0;
 }
@@ -269,10 +274,6 @@ bool _if_statement() {
     _ast *_past = (_ast *) malloc(sizeof(_ast));
     if (_expression(_past)) {
       _read_token();
-      _ast_print_infix(*_past);
-      puts("");
-      _ast_print_postfix(*_past);
-      puts("");
       if (_token == KEY_WORD_THEN) {
         _read_token();
         if (_list_inst()) {
@@ -580,7 +581,8 @@ bool _term_aux(_ast *_past) {
     _token == DELIMITER_EQUAL || _token == DELIMITER_DIVIDE_EQUAL || _token == DELIMITER_LESS_THAN ||
     _token == DELIMITER_LESS_THAN_EQUAL || _token == DELIMITER_GREATER_THAN || _token == DELIMITER_GREATER_THAN_EQUAL ||
     _token == DELIMITER_PLUS || _token == DELIMITER_DASH || _token == DELIMITER_AND || _token == DELIMITER_PAR_CLOSED ||
-    _token == DELIMITER_FAT_ARROW || _token == KEY_WORD_IS || _token == DELIMITER_PIPE || _token == DELIMITER_SEMICOLON
+    _token == DELIMITER_FAT_ARROW || _token == KEY_WORD_IS || _token == DELIMITER_PIPE || _token == DELIMITER_SEMICOLON ||
+    _token == KEY_WORD_LOOP
   ) {
     result = _follow = true;
   }

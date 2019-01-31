@@ -16,13 +16,12 @@ test3:Boolean;
 
 begin
 
-myLoop:
-while (test1 < 5.0) loop
+while test2 < 5.0 loop
   test1 := 3;
-end loop myLoop;
+end loop;
 
 loop
-  if test1 < 0 then
+  if test2 < 0 then
     test := 1.0;
   end if;
 end loop;

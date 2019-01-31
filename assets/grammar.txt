@@ -192,12 +192,12 @@ Identified_loop_statement [DONE] {
 }
 
 Loop_statement [UNCOMPLETED] {
-  'while' Expression Loop_statement_aux_aux,
-  Loop_statement_aux_aux
+  'while' Expression Loop_statement_aux,
+  Loop_statement_aux
 }
 
 Loop_statement_aux [DONE] {
-  'loop' List_inst 'end' 'loop' Loop_statement_aux_aux_aux
+  'loop' List_inst 'end' 'loop' Loop_statement_aux_aux
 }
 
 Loop_statement_aux_aux [DONE] {
