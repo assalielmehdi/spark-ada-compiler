@@ -9,6 +9,7 @@
 #include "tab_symb.h"
 #include "errors.h"
 #include "ast.h"
+#include "cfg.h"
 
 #define DEBUG_MODE false
 
@@ -61,14 +62,19 @@ bool _proc() {
         if (_list_decl()) {
           _read_token();
           if (_token == KEY_WORD_BEGIN) {
+            _cfg_list_inst *list_inst = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
             _read_token();
-            if (_list_inst()) {
+            if (_list_inst(list_inst)) {
               _read_token();
               if (_token == KEY_WORD_END) {
                 _read_token();
                 if (_token == IDENTIFIER) {
                   _read_token();
                   if (_token == DELIMITER_SEMICOLON) {
+                    // TODO: Remove print cfg
+                    puts("--------------------");
+                    puts("Instructions:");
+                    _cfg_print_list_inst(*list_inst, 0);
                     result = true;
                   }
                 }
@@ -224,27 +230,27 @@ bool _const() {
   return result;
 }
 
-bool _list_inst() {
+bool _list_inst(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_list_inst() : %s\n", yytext);
   bool result = false;
-  if (_if_statement()) {
+  if (_if_statement(pastCfg)) {
     _read_token();
-    if (_list_inst_aux()) {
+    if (_list_inst_aux(pastCfg)) {
       result = true;
     } 
-  } else if (_case_statement()) {
+  } else if (_case_statement(pastCfg)) {
     _read_token();
-    if (_list_inst_aux()) {
+    if (_list_inst_aux(pastCfg)) {
       result = true;
     } 
-  } else if (_identified_statement()){
+  } else if (_identified_statement(pastCfg)){
     _read_token();
-    if(_list_inst_aux()){
+    if(_list_inst_aux(pastCfg)){
       result = true;
     }
-  } else if (_loop_statement()) {
+  } else if (_loop_statement(pastCfg)) {
     _read_token();
-    if(_list_inst_aux()){
+    if(_list_inst_aux(pastCfg)){
       result = true;
     }
   } else if (
@@ -256,10 +262,10 @@ bool _list_inst() {
   return result;
 }
 
-bool _list_inst_aux() {
+bool _list_inst_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_list_inst_aux() : %s\n", yytext);
   bool result = false;
-  if (_list_inst()) {
+  if (_list_inst(pastCfg)) {
     result = true;
   } else if (
     _token == KEY_WORD_END || _token == KEY_WORD_ELSIF ||
@@ -270,19 +276,23 @@ bool _list_inst_aux() {
   return result;
 }
 
-bool _if_statement() {
+bool _if_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_if_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_IF) {
+    _cfg_if_statement *if_statements = (_cfg_if_statement *) malloc(sizeof(_cfg_if_statement));
     _read_token();
     _ast *_past = (_ast *) malloc(sizeof(_ast));
     if (_expression(_past)) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
+        _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
         _read_token();
-        if (_list_inst()) {
+        if (_list_inst(body)) {
+          (*if_statements) = _cfg_add_if_statement(*if_statements, *_past, *body);
           _read_token();
-          if (_elsif_statement()) {
+          if (_elsif_statement(if_statements)) {
+            (*pastCfg) = _cfg_add_if_inst(*pastCfg, *if_statements);
             result = true;
           }
         }
@@ -292,7 +302,7 @@ bool _if_statement() {
   return result;
 }
 
-bool _elsif_statement() {
+bool _elsif_statement(_cfg_if_statement *pastIfStatements) {
   if (DEBUG_MODE == true) printf("_elsif_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_ELSIF) {
@@ -301,30 +311,34 @@ bool _elsif_statement() {
     if (_expression(_past)) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
+        _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
         _read_token();
-        if (_list_inst()) {
+        if (_list_inst(body)) {
+          (*pastIfStatements) = _cfg_add_else_if_statement(*pastIfStatements, *_past, *body);
           _read_token();
-          if (_elsif_statement()) {
+          if (_elsif_statement(pastIfStatements)) {
             result = true;
           }
         }
       }
     }
   } else if (_token == KEY_WORD_ELSE) {
+    _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
     _read_token();
-    if (_list_inst()) {
+    if (_list_inst(body)) {
+      (*pastIfStatements) = _cfg_add_else_statement(*pastIfStatements, *body);
       _read_token();
-      if (_endif_statement()) {
+      if (_endif_statement(pastIfStatements)) {
         result = true;
       }
     }
-  } else if (_endif_statement()) {
+  } else if (_endif_statement(pastIfStatements)) {
     result = true;
   }
   return result;
 }
 
-bool _endif_statement() {
+bool _endif_statement(_cfg_if_statement *pastIfStatements) {
   if (DEBUG_MODE == true) printf("_endif_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_END) {
@@ -642,7 +656,7 @@ bool _primary(_ast *_past) {
   return result;
 }
 
-bool _case_statement() {
+bool _case_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_case_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_CASE) {
@@ -652,9 +666,9 @@ bool _case_statement() {
       _read_token();
       if (_token == KEY_WORD_IS) {
         _read_token();
-        if (_case_statement_alternative()) {
+        if (_case_statement_alternative(pastCfg)) {
           _read_token();
-          if (_case_statement_aux()) {
+          if (_case_statement_aux(pastCfg)) {
             result = true;
           }
         }
@@ -664,7 +678,7 @@ bool _case_statement() {
   return result;
 }
 
-bool _case_statement_aux() {
+bool _case_statement_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_case_statement_aux() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_END) {
@@ -675,25 +689,25 @@ bool _case_statement_aux() {
         result = true;
       }
     }
-  } else if (_case_statement_alternative()) {
+  } else if (_case_statement_alternative(pastCfg)) {
     _read_token();
-    if (_case_statement_aux()) {
+    if (_case_statement_aux(pastCfg)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _case_statement_alternative() {
+bool _case_statement_alternative(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_case_statement_alternative() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_WHEN) {
     _read_token();
-    if (_choice_list()) {
+    if (_choice_list(pastCfg)) {
       _read_token();
       if (_token == DELIMITER_FAT_ARROW) {
         _read_token();
-        if (_list_inst()) {
+        if (_list_inst(pastCfg)) {
           result = true;
         }
       }
@@ -702,26 +716,26 @@ bool _case_statement_alternative() {
   return result;
 }
 
-bool _choice_list() {
+bool _choice_list(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_choice_list() : %s\n", yytext);
   bool result = false;
-  if (_choice()) {
+  if (_choice(pastCfg)) {
     _read_token();
-    if (_choice_list_aux()) {
+    if (_choice_list_aux(pastCfg)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _choice_list_aux() {
+bool _choice_list_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_choice_list_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_PIPE) {
     _read_token();
-    if (_choice()) {
+    if (_choice(pastCfg)) {
       _read_token();
-      if (_choice_list_aux()) {
+      if (_choice_list_aux(pastCfg)) {
         result = true;
       }
     }
@@ -731,7 +745,7 @@ bool _choice_list_aux() {
   return result;
 }
 
-bool _choice() {
+bool _choice(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_choice() : %s\n", yytext);
   bool result = false;
   _ast *_past = (_ast *) malloc(sizeof(_ast));
@@ -743,32 +757,32 @@ bool _choice() {
   return result;
 }
 
-bool _identified_statement() {
+bool _identified_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_identified_statement() : %s\n", yytext);
   bool result = false;
   if (_token == IDENTIFIER) {
     _current_var_name = (char *) malloc((strlen(yytext) + 1) * sizeof(char));
     strcpy(_current_var_name, yytext);
     _read_token();
-    if (_identified_statement_aux()) {
+    if (_identified_statement_aux(pastCfg)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _identified_statement_aux() {
+bool _identified_statement_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_identified_statement_aux() : %s\n", yytext);
   bool result = false;
-  if (_sample_inst()) {
+  if (_sample_inst(pastCfg)) {
     result = true;
-  } else if (_identified_loop_statement()) {
+  } else if (_identified_loop_statement(pastCfg)) {
     result = true;
   }
   return result;
 }
 
-bool _sample_inst() {
+bool _sample_inst(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_sample_inst() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_ASSIGN) {
@@ -780,6 +794,7 @@ bool _sample_inst() {
     if (_expression(_past)) {
       _read_token();
       if (_token == DELIMITER_SEMICOLON) {
+        (*pastCfg) = _cfg_add_assign_inst(*pastCfg, _current_var_name, *_past);
         result = true;
       }
     }
@@ -787,48 +802,50 @@ bool _sample_inst() {
   return result;
 }
 
-bool _identified_loop_statement() {
+bool _identified_loop_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_identified_loop_statement() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_PERIOD) {
     _read_token();
-    if (_loop_statement()) {
+    if (_loop_statement(pastCfg)) {
       result = true;
     }
   }
   return result;
 }
 
-bool _loop_statement() {
+bool _loop_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_loop_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_WHILE) {
     _read_token();
     _ast *_past = (_ast *) malloc(sizeof(_ast));
     if (_expression(_past)) {
+      _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
       _read_token();
-      if (_loop_statement_aux()) {
+      if (_loop_statement_aux(body)) {
+        (*pastCfg) = _cfg_add_while_inst(*pastCfg, *_past, *body);
         result = true;
       }
     }
-  } else if (_loop_statement_aux()) {
+  } else if (_loop_statement_aux(pastCfg)) {
     result = true;
   } 
   return result;
 }
 
-bool _loop_statement_aux() {
+bool _loop_statement_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_loop_statement_aux() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_LOOP) {
     _read_token();
-    if (_list_inst()) {
+    if (_list_inst(pastCfg)) {
       _read_token();
       if (KEY_WORD_END) {
         _read_token();
         if (_token == KEY_WORD_LOOP) {
           _read_token();
-          if (_loop_statement_aux_aux()) {
+          if (_loop_statement_aux_aux(pastCfg)) {
             result = true;
           }
         }
@@ -838,7 +855,7 @@ bool _loop_statement_aux() {
   return result;
 }
 
-bool _loop_statement_aux_aux() {
+bool _loop_statement_aux_aux(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_loop_statement_aux_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_SEMICOLON) {

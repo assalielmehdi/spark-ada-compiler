@@ -69,6 +69,24 @@ _cfg_if_statement _cfg_add_if_statement(_cfg_if_statement if_statement, _ast con
   return if_statement;
 }
 
+_cfg_if_statement _cfg_add_else_if_statement(_cfg_if_statement if_statement, _ast condition, _cfg_list_inst body) {
+  _cfg_if_bloc *node = (_cfg_if_bloc *) malloc(sizeof(_cfg_if_bloc));
+  node->type = CFG_ELSE_IF_BLOC;
+  node->condition = condition;
+  node->body = body;
+  node->next = NULL;
+  if (if_statement == NULL) {
+    if_statement = node;
+  } else {
+    _cfg_if_bloc *cur = if_statement;
+    while (cur->next != NULL) {
+      cur = cur->next;
+    }
+    cur->next = node;
+  }
+  return if_statement;
+}
+
 _cfg_if_statement _cfg_add_else_statement(_cfg_if_statement if_statement, _cfg_list_inst body) {
   _cfg_if_bloc *node = (_cfg_if_bloc *) malloc(sizeof(_cfg_if_bloc));
   node->type = CFG_ELSE_BLOC;
@@ -126,6 +144,9 @@ void _cfg_print_list_inst(_cfg_list_inst list_inst, int indent) {
       case CFG_INST_IF:
         curIf = cur->instruction.body.if_statement;
         while (curIf != NULL) {
+          if (curIf != cur->instruction.body.if_statement) {
+            _cfg_print_indent(indent);
+          }
           switch (curIf->type) {
             case CFG_IF_BLOC:
               printf("If: ");

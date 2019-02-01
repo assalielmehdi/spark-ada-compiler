@@ -63,6 +63,8 @@ _cfg_if_statement _cfg_if_statement_init();
 
 _cfg_if_statement _cfg_add_if_statement(_cfg_if_statement if_statement, _ast condition, _cfg_list_inst body);
 
+_cfg_if_statement _cfg_add_else_if_statement(_cfg_if_statement if_statement, _ast condition, _cfg_list_inst body);
+
 _cfg_if_statement _cfg_add_else_statement(_cfg_if_statement if_statement, _cfg_list_inst body);
 
 _cfg_list_inst _cfg_add_while_inst(_cfg_list_inst list_inst, _ast condition, _cfg_list_inst body);

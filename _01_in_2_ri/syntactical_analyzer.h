@@ -6,6 +6,8 @@
 #define SYNTACTICAL_ANALYZER
 
 #include <stdbool.h>
+#include "ast.h"
+#include "cfg.h"
 
 typedef enum {
   KEY_WORD_ABORT,
@@ -141,60 +143,60 @@ bool _type();
 
 bool _const();
 
-bool _list_inst();
+bool _list_inst(_cfg_list_inst *pastCfg);
 
-bool _list_inst_aux();
+bool _list_inst_aux(_cfg_list_inst *pastCfg);
 
-bool _if_statement();
+bool _if_statement(_cfg_list_inst *pastCfg);
 
-bool _elsif_statement();
+bool _elsif_statement(_cfg_if_statement *pastIfStatements);
 
-bool _endif_statement();
+bool _endif_statement(_cfg_if_statement *pastIfStatements);
 
-bool _expression();
+bool _expression(_ast *_past);
 
-bool _expression_aux();
+bool _expression_aux(_ast *_past);
 
-bool _relation();
+bool _relation(_ast *_past);
 
-bool _relation_aux();
+bool _relation_aux(_ast *_past);
 
-bool _simple_expression();
+bool _simple_expression(_ast *_past);
 
-bool _simple_expression_aux();
+bool _simple_expression_aux(_ast *_past);
 
-bool _term();
+bool _term(_ast *_past);
 
-bool _term_aux();
+bool _term_aux(_ast *_past);
 
-bool _factor();
+bool _factor(_ast *_past);
 
-bool _primary();
+bool _primary(_ast *_past);
 
-bool _case_statement();
+bool _case_statement(_cfg_list_inst *pastCfg);
 
-bool _case_statement_aux();
+bool _case_statement_aux(_cfg_list_inst *pastCfg);
 
-bool _case_statement_alternative();
+bool _case_statement_alternative(_cfg_list_inst *pastCfg);
 
-bool _choice_list();
+bool _choice_list(_cfg_list_inst *pastCfg);
 
-bool _choice_list_aux();
+bool _choice_list_aux(_cfg_list_inst *pastCfg);
 
-bool _choice();
+bool _choice(_cfg_list_inst *pastCfg);
 
-bool _identified_statement();
+bool _identified_statement(_cfg_list_inst *pastCfg);
 
-bool _identified_statement_aux();
+bool _identified_statement_aux(_cfg_list_inst *pastCfg);
 
-bool _sample_inst();
+bool _sample_inst(_cfg_list_inst *pastCfg);
 
-bool _identified_loop_statement();
+bool _identified_loop_statement(_cfg_list_inst *pastCfg);
 
-bool _loop_statement();
+bool _loop_statement(_cfg_list_inst *pastCfg);
 
-bool _loop_statement_aux();
+bool _loop_statement_aux(_cfg_list_inst *pastCfg);
 
-bool _loop_statement_aux_aux();
+bool _loop_statement_aux_aux(_cfg_list_inst *pastCfg);
 
 #endif
