@@ -10,6 +10,7 @@
 #include "errors.h"
 #include "ast.h"
 #include "cfg.h"
+#include "pseudo_code_generator.h"
 
 #define DEBUG_MODE false
 
@@ -25,6 +26,7 @@ int main(int argc, char **argv) {
   _reset_tab_symbol();
   _read_token();
   _cfg_list_inst *list_inst = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+  *list_inst = NULL;
   if (_proc(list_inst)) {
     puts("--------------------");
     puts("Program syntactically correct");
@@ -34,15 +36,18 @@ int main(int argc, char **argv) {
   }
   if (DEBUG_MODE == true) {
     puts("--------------------");
+    puts("Errors:");
+    _show_semantic_errors();
+    puts("--------------------");
     puts("Sym Table:");
     _print_tab_symbol();
   }
   puts("--------------------");
-  puts("Errors:");
-  _show_semantic_errors();
-  puts("--------------------");
   puts("Instructions:");
   _cfg_print_list_inst(*list_inst, 0);
+  puts("--------------------");
+  puts("Pseudo code:");
+  _pc_generator_cfg_to_pc(*list_inst);
   return EXIT_SUCCESS;
 }
 
@@ -286,6 +291,7 @@ bool _if_statement(_cfg_list_inst *pastCfg) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
         _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+        *body = NULL;
         _read_token();
         if (_list_inst(body)) {
           (*if_statements) = _cfg_add_if_statement(*if_statements, *_past, *body);
@@ -311,6 +317,7 @@ bool _elsif_statement(_cfg_if_statement *pastIfStatements) {
       _read_token();
       if (_token == KEY_WORD_THEN) {
         _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+        *body = NULL;
         _read_token();
         if (_list_inst(body)) {
           (*pastIfStatements) = _cfg_add_else_if_statement(*pastIfStatements, *_past, *body);
@@ -323,6 +330,7 @@ bool _elsif_statement(_cfg_if_statement *pastIfStatements) {
     }
   } else if (_token == KEY_WORD_ELSE) {
     _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+    *body = NULL;
     _read_token();
     if (_list_inst(body)) {
       (*pastIfStatements) = _cfg_add_else_statement(*pastIfStatements, *body);
@@ -408,7 +416,6 @@ bool _relation_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_EQUAL) {
-    *_past = _ast_create_operation_node(OPERATION_EQUAL, *_past, NULL);
     _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
     if (_simple_expression(_right)) {
@@ -817,10 +824,11 @@ bool _loop_statement(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_loop_statement() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_WHILE) {
-    _read_token();
     _ast *_past = (_ast *) malloc(sizeof(_ast));
+    _read_token();
     if (_expression(_past)) {
       _cfg_list_inst *body = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+      *body = NULL;
       _read_token();
       if (_loop_statement_aux(body)) {
         (*pastCfg) = _cfg_add_while_inst(*pastCfg, *_past, *body);
