@@ -13,9 +13,9 @@ compile: in_to_ri pc_to_out
 # Compile files in _01_in_2_ri directory
 # Output file is 'compiler' in target directory
 
-in_to_ri: lexical_analyzer ast symbols_table errors syntactical_analyzer
+in_to_ri: lexical_analyzer ast cfg symbols_table errors syntactical_analyzer
 	cd ${IN_2_RI_DIR}; \
-	gcc -o compiler lex.yy.o syntactical_analyzer.o errors.o tab_symb.o ast.o; \
+	gcc -o compiler lex.yy.o syntactical_analyzer.o errors.o tab_symb.o cfg.o ast.o; \
 	mv compiler ${TARGET_DIR}/compiler
 
 lexical_analyzer:
@@ -38,6 +38,10 @@ syntactical_analyzer:
 ast:
 	cd ${IN_2_RI_DIR}; \
 	gcc -c ast.c
+
+cfg:
+	cd ${IN_2_RI_DIR}; \
+	gcc -c cfg.c
 
 # ----------------------------------------------
 
