@@ -1,3 +1,5 @@
+# Author: El Mehdi ASSALI
+
 BASE_DIR := ${shell pwd}
 TARGET_DIR := ${BASE_DIR}/target
 IN_2_RI_DIR := ${BASE_DIR}/_01_in_2_ri

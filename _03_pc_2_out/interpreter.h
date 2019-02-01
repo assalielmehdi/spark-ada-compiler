@@ -1,3 +1,7 @@
+/**
+ * Author: El Mehdi ASSALI
+ */
+
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 

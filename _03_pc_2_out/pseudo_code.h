@@ -1,3 +1,7 @@
+/**
+ * Author: El Mehdi ASSALI
+ */
+
 #ifndef PSEUDO_CODE_H
 #define PSEUDO_CODE_H
 

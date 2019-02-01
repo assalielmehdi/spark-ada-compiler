@@ -1,3 +1,7 @@
+/**
+ * Authors: El Mehdi ASSALI and Widad BOUJAAFAR
+ */
+
 #ifndef SYNTACTICAL_ANALYZER
 #define SYNTACTICAL_ANALYZER
 

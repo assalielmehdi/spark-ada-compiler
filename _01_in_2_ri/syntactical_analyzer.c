@@ -1,3 +1,7 @@
+/**
+ * Authors: El Mehdi ASSALI, Widad BOUJAAFAR and Anass BAIROUK
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

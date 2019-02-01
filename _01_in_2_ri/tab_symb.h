@@ -1,3 +1,7 @@
+/**
+ * Authors: El Mehdi ASSALI and Widad BOUJAAFAR
+ */
+
 #ifndef TAB_SYMB_H
 #define TAB_SYMB_H
 

@@ -1,3 +1,7 @@
+/**
+ * Author: El Mehdi ASSALI
+ */
+
 #ifndef AST_H
 #define AST_H
 

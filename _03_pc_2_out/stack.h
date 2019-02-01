@@ -1,3 +1,7 @@
+/**
+ * Author: El Mehdi ASSALI
+ */
+
 #ifndef STACK_H
 #define STACK_H
 

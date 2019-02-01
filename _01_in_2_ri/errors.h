@@ -1,3 +1,7 @@
+/**
+ * Authors: El Mehdi ASSALI and Widad BOUJAAFAR
+ */
+
 #ifndef ERROR_H
 #define ERROR_H
 
