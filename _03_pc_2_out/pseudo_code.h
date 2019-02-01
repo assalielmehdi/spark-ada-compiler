@@ -50,10 +50,6 @@ typedef enum {
 } _pc_instruction_code;
 
 typedef union {
-  struct {
-    char *name;
-    double value;
-  } data;
   char *label;
   char *variable;
   double constant;
@@ -76,7 +72,11 @@ typedef struct {
 
 _pc_code *_pc_init();
 
-void _pc_add_instruction(_pc_code *pc_code, _pc_instruction_code code, _pc_instruction_param param);
+void _pc_add_variable_instruction(_pc_code *pc_code, _pc_instruction_code code, char *name);
+
+void _pc_add_labeled_instruction(_pc_code *pc_code, _pc_instruction_code code, char *label);
+
+void _pc_add_constant_instruction(_pc_code *pc_code, _pc_instruction_code code, double constant);
 
 void _pc_print_code(_pc_code pc_code);
 

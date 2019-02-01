@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
 
@@ -22,4 +23,17 @@ _stack _stack_pop(_stack stack) {
 
 _stack_node_element _stack_peek(_stack stack) {
   return stack->element;
+}
+
+void _stack_print(_stack stack) {
+  if (stack != NULL) {
+    _stack_print(stack->next);
+    if (stack->element.type == STACK_NODE_NUMBER) {
+      printf("%.2lf ", stack->element.value.number);
+    } else if (stack->element.type == STACK_NODE_STRING) {
+      printf("%s ", stack->element.value.string);
+    } else if (stack->element.type == STACK_NODE_VARIABLE) {
+      printf("%s ", stack->element.value.variable);
+    }
+  }
 }

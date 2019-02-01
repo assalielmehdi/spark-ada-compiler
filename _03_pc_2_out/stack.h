@@ -3,7 +3,8 @@
 
 typedef enum {
   STACK_NODE_NUMBER,
-  STACK_NODE_STRING
+  STACK_NODE_STRING,
+  STACK_NODE_VARIABLE
 } _stack_node_type;
 
 typedef union {
@@ -31,5 +32,7 @@ _stack _stack_push(_stack stack, _stack_node_type type, _stack_node_value value)
 _stack _stack_pop(_stack stack);
 
 _stack_node_element _stack_peek(_stack stack);
+
+void _stack_print(_stack stack);
 
 #endif
