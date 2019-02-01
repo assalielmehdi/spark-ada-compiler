@@ -24,7 +24,8 @@ char *_current_var_name = NULL;
 int main(int argc, char **argv) {
   _reset_tab_symbol();
   _read_token();
-  if (_proc()) {
+  _cfg_list_inst *list_inst = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
+  if (_proc(list_inst)) {
     puts("--------------------");
     puts("Program syntactically correct");
   } else {
@@ -39,6 +40,9 @@ int main(int argc, char **argv) {
   puts("--------------------");
   puts("Errors:");
   _show_semantic_errors();
+  puts("--------------------");
+  puts("Instructions:");
+  _cfg_print_list_inst(*list_inst, 0);
   return EXIT_SUCCESS;
 }
 
@@ -50,7 +54,7 @@ void _read_token() {
   }
 }
 
-bool _proc() {
+bool _proc(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_proc() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_PROCEDURE) {
@@ -62,19 +66,14 @@ bool _proc() {
         if (_list_decl()) {
           _read_token();
           if (_token == KEY_WORD_BEGIN) {
-            _cfg_list_inst *list_inst = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
             _read_token();
-            if (_list_inst(list_inst)) {
+            if (_list_inst(pastCfg)) {
               _read_token();
               if (_token == KEY_WORD_END) {
                 _read_token();
                 if (_token == IDENTIFIER) {
                   _read_token();
                   if (_token == DELIMITER_SEMICOLON) {
-                    // TODO: Remove print cfg
-                    puts("--------------------");
-                    puts("Instructions:");
-                    _cfg_print_list_inst(*list_inst, 0);
                     result = true;
                   }
                 }

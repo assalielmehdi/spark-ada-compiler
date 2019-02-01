@@ -127,7 +127,7 @@ extern int yylineno;
 
 void _read_token();
 
-bool _proc();
+bool _proc(_cfg_list_inst *pastCfg);
 
 bool _list_decl();
 
