@@ -10,6 +10,7 @@
 #include "cfg.h"
 
 typedef enum {
+  KEY_WORD_PRINT,
   KEY_WORD_ABORT,
   KEY_WORD_ELSE,
   KEY_WORD_NEW,

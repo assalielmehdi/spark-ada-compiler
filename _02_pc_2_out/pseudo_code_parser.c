@@ -36,26 +36,10 @@ int main(int argc, char **argv) {
   _currentLabels = _pc_parser_labels_init();
   _pc_parser_read_token();
   if (_pc_parser_pseudo_code()) {
-    puts("--------------------");
-    puts("Pseudo code syntactically correct");
+    _interpreter_process(*_pseudo_code, _data, _allLabels);
   } else {
-    puts("--------------------");
     puts("Pseudo code syntactically incorrect");
   }
-  if (DEBUG_MODE == true) {
-    puts("--------------------");
-    puts("Variables:");
-    _pc_parser_print_data(_data);
-    puts("--------------------");
-    puts("Labels:");
-    _pc_parser_print_labels(_allLabels);
-    puts("--------------------");
-    puts("Pseudo code:");
-    _pc_print_code(*_pseudo_code);
-  }
-  puts("--------------------");
-  puts("Code interpretation:");
-  _interpreter_process(*_pseudo_code, _data, _allLabels);
   return EXIT_SUCCESS;
 }
 

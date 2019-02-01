@@ -28,26 +28,14 @@ int main(int argc, char **argv) {
   _cfg_list_inst *list_inst = (_cfg_list_inst *) malloc(sizeof(_cfg_list_inst));
   *list_inst = NULL;
   if (_proc(list_inst)) {
-    puts("--------------------");
-    puts("Program syntactically correct");
+    if (_count_semantic_errors() == 0) {
+      _pc_generator_cfg_to_pc(*list_inst);
+    } else {
+      _show_semantic_errors();
+    }
   } else {
-    puts("--------------------");
     puts("Program syntactically incorrect");
   }
-  if (DEBUG_MODE == true) {
-    puts("--------------------");
-    puts("Errors:");
-    _show_semantic_errors();
-    puts("--------------------");
-    puts("Sym Table:");
-    _print_tab_symbol();
-  }
-  puts("--------------------");
-  puts("Instructions:");
-  _cfg_print_list_inst(*list_inst, 0);
-  puts("--------------------");
-  puts("Pseudo code:");
-  _pc_generator_cfg_to_pc(*list_inst);
   return EXIT_SUCCESS;
 }
 
@@ -174,6 +162,13 @@ bool _decl_aux_aux() {
         ((_token == BOOLEAN_TRUE_VALUE || _token == BOOLEAN_FALSE_VALUE) && _var->value_type != VAR_VALUE_BOOLEAN)
       ) {
         _add_semantic_error(BADLY_INITIALIZED, _var->line, _var->name);
+      } else {
+        if (_var->value_type == VAR_VALUE_INTEGER ||
+          _var->value_type == VAR_VALUE_BOOLEAN ||
+          _var->value_type == VAR_VALUE_FLOAT
+        ) {
+          _var->value.number_value = atof(yytext);
+        }
       }
       _read_token();
       if (_token == DELIMITER_SEMICOLON) {
@@ -237,7 +232,19 @@ bool _const() {
 bool _list_inst(_cfg_list_inst *pastCfg) {
   if (DEBUG_MODE == true) printf("_list_inst() : %s\n", yytext);
   bool result = false;
-  if (_if_statement(pastCfg)) {
+  if (_token == KEY_WORD_PRINT) {
+    _read_token();
+    if (_token == IDENTIFIER) {
+      if (_in_tab_symbol(yytext) == false) {
+        _add_semantic_error(NOT_DECLARED, yylineno, yytext);
+      }
+      *pastCfg = _cfg_add_print_inst(*pastCfg, yytext);
+      _read_token();
+      if (_token == DELIMITER_SEMICOLON) {
+        return true;
+      }
+    }
+  } else if (_if_statement(pastCfg)) {
     _read_token();
     if (_list_inst_aux(pastCfg)) {
       result = true;

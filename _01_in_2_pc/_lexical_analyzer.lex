@@ -14,6 +14,7 @@ CHARACTER  [A-Za-z]
 
 [\n\t ]+
 "--"[^\n]* return COMMENT;
+"print" return KEY_WORD_PRINT;
 "abort" return KEY_WORD_ABORT;
 "else" return KEY_WORD_ELSE;
 "new" return KEY_WORD_NEW;

@@ -5,7 +5,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<stdbool.h>
 #include "tab_symb.h"
 #include "syntactical_analyzer.h"
 
@@ -87,4 +86,15 @@ void _print_tab_symbol() {
     printf("}");
   }
   printf("]\n");
+}
+
+void _tab_sym_to_pc() {
+  for (int i = 0; i < _var_count; i++) {
+    if (_tab_symbol[i]->value_type == VAR_VALUE_FLOAT || 
+      _tab_symbol[i]->value_type == VAR_VALUE_INTEGER ||
+      _tab_symbol[i]->value_type == VAR_VALUE_BOOLEAN
+    ) {
+      printf("DATA %s %.2lf\n", _tab_symbol[i]->name, _tab_symbol[i]->value.number_value);
+    }
+  }
 }

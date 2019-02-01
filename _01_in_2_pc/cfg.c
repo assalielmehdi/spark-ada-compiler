@@ -123,6 +123,24 @@ _cfg_list_inst _cfg_add_while_inst(_cfg_list_inst list_inst, _ast condition, _cf
   return list_inst;
 }
 
+_cfg_list_inst _cfg_add_print_inst(_cfg_list_inst list_inst, char *name) {
+  _cfg_inst_node *node = (_cfg_inst_node *) malloc(sizeof(_cfg_inst_node));
+  node->instruction.type = CFG_INST_PRINT;
+  node->instruction.body.var_to_print = (char *) malloc((1 + strlen(name)) * sizeof(char));
+  strcpy(node->instruction.body.var_to_print, name);
+  node->next = NULL;
+  if (list_inst == NULL) {
+    list_inst = node;
+  } else {
+    _cfg_inst_node *cur = list_inst;
+    while (cur->next != NULL) {
+      cur = cur->next;
+    }
+    cur->next = node;
+  }
+  return list_inst;
+}
+
 void _cfg_print_indent(int indent) {
   if (indent > 0) {
     printf(" ");
@@ -173,6 +191,9 @@ void _cfg_print_list_inst(_cfg_list_inst list_inst, int indent) {
         _ast_print_infix(cur->instruction.body.while_statement.condition);
         printf("\n");
         _cfg_print_list_inst(cur->instruction.body.while_statement.body, indent + 2);
+        break;
+      case CFG_INST_PRINT:
+        printf("Print: %s\n", cur->instruction.body.var_to_print);
         break;
     }
     cur = cur->next;

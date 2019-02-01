@@ -44,6 +44,10 @@ void _show_semantic_error(_semantic_error *error) {
 }
 
 void _show_semantic_errors() {
+  printf("Semantic errors:\n");
+  if (_errors_count == 0) {
+    printf("No semantic erros.\n");
+  }
   for (int i = 0; i < _errors_count; i++) {
 		_show_semantic_error(_errors[i]);
 	}

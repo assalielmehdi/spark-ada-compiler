@@ -10,4 +10,6 @@ while n > 0 loop
   n := n - 1;
 end loop;
 
+print fact;
+
 end factorial;

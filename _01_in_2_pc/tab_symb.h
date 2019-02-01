@@ -5,6 +5,8 @@
 #ifndef TAB_SYMB_H
 #define TAB_SYMB_H
 
+#include<stdbool.h>
+
 typedef enum {
   VAR_VALUE_INTEGER,
   VAR_VALUE_FLOAT,
@@ -38,5 +40,7 @@ bool _var_initialized(char *name);
 void _reset_tab_symbol();
 
 void _print_tab_symbol();
+
+void _tab_sym_to_pc();
 
 #endif

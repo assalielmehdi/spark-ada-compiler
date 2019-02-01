@@ -45,6 +45,7 @@ Const [DONE] {
 }
 
 List_inst [UNCOMPLETED] {
+  'print' Idf,
   If_statement List_inst_aux,
   Case_statement List_inst_aux,
   Identified_statement List_inst,
