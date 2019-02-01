@@ -41,7 +41,8 @@ Inst {
   "EVAL_L",
   "EVAL_LE", 
   "EVAL_E",
-  "EVAL_NE" 
+  "EVAL_NE",
+  "PRINT_NUMBER"
 }
 
 Jump_label {

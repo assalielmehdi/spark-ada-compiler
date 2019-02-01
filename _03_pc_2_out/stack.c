@@ -1,15 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "stack.h"
 
 _stack _stack_init() {
   return NULL;
 }
 
-_stack _stack_push(_stack stack, _stack_node_type type, _stack_node_value value) {
+_stack _stack_push_number(_stack stack, double value) {
   _stack_node *node = (_stack_node *) malloc(sizeof(_stack_node));
-  node->element.type = type;
-  node->element.value = value;
+  node->element.type = STACK_NODE_NUMBER;
+  node->element.value.number = value;
+  node->next = stack;
+  return node;
+}
+
+_stack _stack_push_string(_stack stack, char *value) {
+  _stack_node *node = (_stack_node *) malloc(sizeof(_stack_node));
+  node->element.type = STACK_NODE_STRING;
+  node->element.value.string = (char *) malloc((1 + strlen(value)) * sizeof(char));
+  strcpy(node->element.value.string, value);
   node->next = stack;
   return node;
 }
@@ -32,8 +42,6 @@ void _stack_print(_stack stack) {
       printf("%.2lf ", stack->element.value.number);
     } else if (stack->element.type == STACK_NODE_STRING) {
       printf("%s ", stack->element.value.string);
-    } else if (stack->element.type == STACK_NODE_VARIABLE) {
-      printf("%s ", stack->element.value.variable);
     }
   }
 }

@@ -42,9 +42,9 @@ ast:
 # Compile files in _03_pc_2_out directory
 # Output file is 'interpreter' in target directory
 
-pc_to_out: pseudo_code_lex stack pseudo_code pseudo_code_parser
+pc_to_out: pseudo_code_lex stack pseudo_code pseudo_code_parser interpreter
 	cd ${PC_2_OUT_DIR}; \
-	gcc -o interpreter lex.yy.o pseudo_code_parser.o pseudo_code.o stack.o; \
+	gcc -o interpreter lex.yy.o interpreter.o pseudo_code_parser.o pseudo_code.o stack.o; \
 	mv interpreter ${TARGET_DIR}/interpreter
 
 pseudo_code_lex:
@@ -63,6 +63,10 @@ pseudo_code:
 pseudo_code_parser:
 	cd ${PC_2_OUT_DIR}; \
 	gcc -c pseudo_code_parser.c
+
+interpreter:
+	cd ${PC_2_OUT_DIR}; \
+	gcc -c interpreter.c
 
 # ----------------------------------------------
 

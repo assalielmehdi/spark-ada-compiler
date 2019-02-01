@@ -1,5 +1,5 @@
 DATA fact 1
-DATA n 1
+DATA n 7
 begin:
 begin_0:
 LOAD n
@@ -16,4 +16,6 @@ SUB
 STORE n
 JMP begin_0:
 end_0:
+LOAD fact
+PRINT_NUMBER
 end:

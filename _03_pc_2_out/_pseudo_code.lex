@@ -30,6 +30,7 @@ NUMBER {INTEGER}("."{INTEGER})?
 "EVAL_LE" return PC_KEY_WORD_EVAL_LE;
 "EVAL_E" return PC_KEY_WORD_EVAL_E;
 "EVAL_NE" return PC_KEY_WORD_EVAL_E;
+"PRINT_NUMBER" return PC_KEY_WORD_PRINT_NUMBER;
 "begin:" return PC_KEY_WORD_BEGIN;
 "end:" return PC_KEY_WORD_END;
 "begin_"{INTEGER}":" return PC_LABEL_BEGIN;

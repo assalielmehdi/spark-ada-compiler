@@ -3,12 +3,10 @@
 
 typedef enum {
   STACK_NODE_NUMBER,
-  STACK_NODE_STRING,
-  STACK_NODE_VARIABLE
+  STACK_NODE_STRING
 } _stack_node_type;
 
 typedef union {
-  char *variable;
   char *string;
   double number;
 } _stack_node_value;
@@ -27,7 +25,9 @@ typedef _stack_node *_stack;
 
 _stack _stack_init();
 
-_stack _stack_push(_stack stack, _stack_node_type type, _stack_node_value value);
+_stack _stack_push_number(_stack stack, double value);
+
+_stack _stack_push_string(_stack stack, char *value);
 
 _stack _stack_pop(_stack stack);
 

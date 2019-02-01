@@ -3,6 +3,7 @@
 #include <string.h>
 #include "pseudo_code.h"
 #include "pseudo_code_parser.h"
+#include "interpreter.h"
 
 #define DEBUG_MODE false
 
@@ -37,15 +38,20 @@ int main(int argc, char **argv) {
     puts("--------------------");
     puts("Pseudo code syntactically incorrect");
   }
+  if (DEBUG_MODE == true) {
+    puts("--------------------");
+    puts("Variables:");
+    _pc_parser_print_data(_data);
+    puts("--------------------");
+    puts("Labels:");
+    _pc_parser_print_labels(_allLabels);
+    puts("--------------------");
+    puts("Pseudo code:");
+    _pc_print_code(*_pseudo_code);
+  }
   puts("--------------------");
-  puts("Variables:");
-  _pc_parser_print_data(_data);
-  puts("--------------------");
-  puts("Labels:");
-  _pc_parser_print_labels(_allLabels);
-  puts("--------------------");
-  puts("Pseudo code:");
-  _pc_print_code(*_pseudo_code);
+  puts("Code interpretation:");
+  _interpreter_process(*_pseudo_code, _data, _allLabels);
   return EXIT_SUCCESS;
 }
 
@@ -79,6 +85,23 @@ _pc_parser_variable _pc_parser_get_variable(_pc_parser_data data, char *name) {
     cur = cur->next;
   }
   return cur->variable;
+}
+
+_pc_parser_data _pc_parser_update_variable(_pc_parser_data data, char *name, double value) {
+  _pc_parser_data_node *cur = data, *prev = NULL;
+  while (cur != NULL && strcmp(cur->variable.name, name) != 0) {
+    prev = cur;
+    cur = cur->next;
+  }
+  if (prev == NULL) {
+    data = data->next;
+    free(cur);
+  } else {
+    prev->next = cur->next;
+    free(cur);
+  }
+  data = _pc_parser_add_variable(data, name, value);
+  return data;
 }
 
 void _pc_parser_print_data(_pc_parser_data data) {
@@ -117,6 +140,17 @@ _pc_parser_labels _pc_parser_add_labels(_pc_parser_labels labels, _pc_parser_lab
     cur = cur->next;
   }
   return labels;
+}
+
+_pc_parser_label _pc_parser_get_label(_pc_parser_labels labels, char *label) {
+  _pc_parser_label_node *cur = labels;
+  while (cur != NULL) {
+    if (strcmp(cur->label.label, label) == 0) {
+      break;
+    }
+    cur = cur->next;
+  }
+  return cur->label;
 }
 
 _pc_parser_labels _pc_paser_clear_labels(_pc_parser_labels labels) {
@@ -248,35 +282,35 @@ bool _pc_parser_inst() {
   } else if (_token == PC_KEY_WORD_STORE) {
     _pc_parser_read_token();
     if (_token == PC_IDENTIFIER) {
-      _pc_add_variable_instruction(_pseudo_code, INSTRUCTION_LOAD, yytext);
+      _pc_add_variable_instruction(_pseudo_code, INSTRUCTION_STORE, yytext);
       _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
       _currentLabels = _pc_paser_clear_labels(_currentLabels);
       result = true;
     }
   } else if (_token == PC_KEY_WORD_ADD) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_ADD, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_SUB) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_SUB, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_MULT) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_MULT, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_DIV) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_DIV, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_MOD) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_MOD, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_JMP) {
     _pc_parser_read_token();
@@ -304,8 +338,8 @@ bool _pc_parser_inst() {
     }
   } else if (_token == PC_KEY_WORD_EVAL_G) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_G, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_EVAL_GE) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_GE, 0);
@@ -314,23 +348,28 @@ bool _pc_parser_inst() {
     result = true;
   } else if (_token == PC_KEY_WORD_EVAL_L) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_L, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_EVAL_LE) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_LE, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_EVAL_E) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_E, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   } else if (_token == PC_KEY_WORD_EVAL_NE) {
     _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_EVAL_NE, 0);
-      _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
-      _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
+    result = true;
+  } else if (_token == PC_KEY_WORD_PRINT_NUMBER) {
+    _pc_add_constant_instruction(_pseudo_code, INSTRUCTION_PRINT_NUMBER, 0);
+    _allLabels = _pc_parser_add_labels(_allLabels, _currentLabels, _pseudo_code->last);
+    _currentLabels = _pc_paser_clear_labels(_currentLabels);
     result = true;
   }
   return result;

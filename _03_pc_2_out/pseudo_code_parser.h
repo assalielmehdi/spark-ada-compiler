@@ -42,6 +42,8 @@ _pc_parser_data _pc_parser_add_variable(_pc_parser_data data, char *name, double
 
 _pc_parser_variable _pc_parser_get_variable(_pc_parser_data data, char *name);
 
+_pc_parser_data _pc_parser_update_variable(_pc_parser_data data, char *name, double value);
+
 void _pc_parser_print_data(_pc_parser_data data);
 
 _pc_parser_labels _pc_parser_labels_init();
@@ -49,6 +51,8 @@ _pc_parser_labels _pc_parser_labels_init();
 _pc_parser_labels _pc_parser_add_label(_pc_parser_labels labels, char *label, _pc_node *instruction);
 
 _pc_parser_labels _pc_parser_add_labels(_pc_parser_labels labels, _pc_parser_labels labelsToAdd, _pc_node *instruction);
+
+_pc_parser_label _pc_parser_get_label(_pc_parser_labels labels, char *label);
 
 _pc_parser_labels _pc_paser_clear_labels(_pc_parser_labels labels);
 
