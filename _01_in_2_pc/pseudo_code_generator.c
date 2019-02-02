@@ -57,7 +57,8 @@ void _pc_generator_cfg_to_pc(_cfg_list_inst list_inst) {
     _tab_sym_to_pc();
     printf("begin:\n");
   }
-  int idx;
+  int idx, idx1;
+  _cfg_if_bloc *if_bloc;
   while (cur != NULL) {
     switch (cur->instruction.type) {
       case CFG_INST_ASSIGN:
@@ -65,6 +66,23 @@ void _pc_generator_cfg_to_pc(_cfg_list_inst list_inst) {
         printf("STORE %s\n",cur->instruction.body.assign_statement.name);
         break;
       case CFG_INST_IF:
+        idx = labelIdx++;
+        printf("begin_%d:\n", idx);
+        if_bloc = cur->instruction.body.if_statement;
+        while (if_bloc != NULL) {
+          if (if_bloc->type == CFG_ELSE_BLOC) {
+            _pc_generator_cfg_to_pc(if_bloc->body);
+          } else {
+            idx1 = labelIdx++;
+            _pc_generator_ast_to_pc(if_bloc->condition);
+            printf("JF end_%d:\n", idx1);
+            _pc_generator_cfg_to_pc(if_bloc->body);
+            printf("JMP end_%d:\n", idx);
+            printf("end_%d:\n", idx1);
+          }
+          if_bloc = if_bloc->next;
+        }
+        printf("end_%d:\n", idx);
         break;
       case CFG_INST_WHILE:
         idx = labelIdx++;

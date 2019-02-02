@@ -6,7 +6,7 @@ result : Boolean := true;
 
 begin
 
-while (i * i <= n) and (result = true) loop
+while (i * i <= n) loop
   if n mod i = 0 then
     result := false;
   end if;

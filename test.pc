@@ -1,0 +1,26 @@
+DATA n 49.00
+DATA i 2.00
+DATA result 0.00
+begin:
+begin_1:
+LOAD i
+LOAD i
+MULT
+LOAD n
+EVAL_LE
+JF end_1:
+begin_3:
+LOAD i
+JF end_4:
+PUSH 0.00
+STORE result
+JMP end_3:
+end_4:
+end_3:
+LOAD i
+PUSH 1.00
+ADD
+STORE i
+JMP begin_1:
+end_1:
+end:
