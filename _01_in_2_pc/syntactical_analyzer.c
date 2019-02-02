@@ -66,8 +66,6 @@ bool _proc(_cfg_list_inst *pastCfg) {
                   _read_token();
                   if (_token == DELIMITER_SEMICOLON) {
                     result = true;
-                  } else {
-                    printf("Line %d: Missing semicolon\n", yylineno);
                   }
                 }
               }
@@ -181,8 +179,6 @@ bool _decl_aux_aux() {
           _add_semantic_error(ALREADY_DECLARED, _var->line, _var->name);
         };
         result = true;
-      } else {
-        printf("Line %d: Missing semicolon\n", yylineno);
       }
     }
   } else if (_token == DELIMITER_SEMICOLON) {
@@ -191,8 +187,6 @@ bool _decl_aux_aux() {
       _add_semantic_error(ALREADY_DECLARED, _var->line, _var->name);
     };
     result = true;
-  } else {
-    printf("Line %d: Missing semicolon\n", yylineno);
   }
   return result;
 }
@@ -254,8 +248,6 @@ bool _list_inst(_cfg_list_inst *pastCfg) {
         if (_list_inst_aux(pastCfg)) {
           return true;
         }
-      } else {
-        printf("Line %d: Missing semicolon\n", yylineno);
       }
     }
   } else if (_if_statement(pastCfg)) {
@@ -375,8 +367,6 @@ bool _endif_statement(_cfg_if_statement *pastIfStatements) {
       _read_token();
       if (_token == DELIMITER_SEMICOLON) {
         result = true;
-      } else {
-        printf("Line %d: Missing semicolon\n", yylineno);
       }
     }
   }
@@ -726,8 +716,6 @@ bool _case_statement_aux(_cfg_list_inst *pastCfg) {
       _read_token();
       if (_token == DELIMITER_SEMICOLON) {
         result = true;
-      } else {
-        printf("Line %d: Missing semicolon\n", yylineno);
       }
     }
   } else if (_case_statement_alternative(pastCfg)) {
@@ -837,8 +825,6 @@ bool _sample_inst(_cfg_list_inst *pastCfg) {
       if (_token == DELIMITER_SEMICOLON) {
         (*pastCfg) = _cfg_add_assign_inst(*pastCfg, _current_var_name, *_past);
         result = true;
-      } else {
-        printf("Line %d: Missing semicolon\n", yylineno);
       }
     }
   }
@@ -874,7 +860,7 @@ bool _loop_statement(_cfg_list_inst *pastCfg) {
     }
   } else if (_loop_statement_aux(pastCfg)) {
     result = true;
-  } 
+  }
   return result;
 }
 
@@ -885,7 +871,7 @@ bool _loop_statement_aux(_cfg_list_inst *pastCfg) {
     _read_token();
     if (_list_inst(pastCfg)) {
       _read_token();
-      if (KEY_WORD_END) {
+      if (_token == KEY_WORD_END) {
         _read_token();
         if (_token == KEY_WORD_LOOP) {
           _read_token();
@@ -909,8 +895,6 @@ bool _loop_statement_aux_aux(_cfg_list_inst *pastCfg) {
     if (_token == DELIMITER_SEMICOLON) {
       result = true;
     }
-  } else {
-    printf("Line %d: Missing semicolon\n", yylineno);
   }
   return result;
 }
