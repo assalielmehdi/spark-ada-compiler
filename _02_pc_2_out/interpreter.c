@@ -99,7 +99,7 @@ void _interpreter_process(_pc_code pseudo_code, _pc_parser_data data, _pc_parser
         label = _pc_parser_get_label(labels, currentInstruction->instruction.param.label);
         element1 = _stack_peek(_data_stack);
         _data_stack = _stack_pop(_data_stack);
-        if (element1.value.number == 1.0) {
+        if (element1.value.number > 0.0) {
           currentInstruction = label.instruction;
         } else {
           currentInstruction = currentInstruction->next;

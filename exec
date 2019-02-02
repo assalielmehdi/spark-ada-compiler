@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+./target/compiler < "$1" > temp.pc
+./target/interpreter < temp.pc
+rm temp.pc

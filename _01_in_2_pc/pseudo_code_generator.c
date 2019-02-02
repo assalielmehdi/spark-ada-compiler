@@ -1,3 +1,7 @@
+/**
+ * Author: El Mehdi ASSALI
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "pseudo_code_generator.h"
@@ -43,6 +47,15 @@ void _pc_generator_ast_to_pc(_ast root) {
           printf("EVAL_NE\n");
           break;
         case OPERATION_PLUS:
+          printf("ADD\n");
+          break;
+        case OPERATION_MOD:
+          printf("MOD\n");
+          break;
+        case OPERATION_AND:
+          printf("MULT\n");
+          break;
+        case OPERATION_OR:
           printf("ADD\n");
           break;
       }

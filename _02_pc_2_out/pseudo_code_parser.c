@@ -37,8 +37,6 @@ int main(int argc, char **argv) {
   _pc_parser_read_token();
   if (_pc_parser_pseudo_code()) {
     _interpreter_process(*_pseudo_code, _data, _allLabels);
-  } else {
-    puts("Pseudo code syntactically incorrect");
   }
   return EXIT_SUCCESS;
 }

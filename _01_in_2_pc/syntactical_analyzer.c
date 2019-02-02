@@ -164,10 +164,15 @@ bool _decl_aux_aux() {
         _add_semantic_error(BADLY_INITIALIZED, _var->line, _var->name);
       } else {
         if (_var->value_type == VAR_VALUE_INTEGER ||
-          _var->value_type == VAR_VALUE_BOOLEAN ||
           _var->value_type == VAR_VALUE_FLOAT
         ) {
           _var->value.number_value = atof(yytext);
+        } else if (_var->value_type == VAR_VALUE_BOOLEAN) {
+          if (_token == BOOLEAN_FALSE_VALUE) {
+            _var->value.number_value = 0.0;
+          } else {
+            _var->value.number_value = 1.0;
+          }
         }
       }
       _read_token();
@@ -383,8 +388,11 @@ bool _expression_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_expression_aux() : %s\n", yytext);
   bool result = false;
   if (_token == KEY_WORD_AND) {
+    *_past = _ast_create_operation_node(OPERATION_AND, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_relation(_past)) {
+    if (_relation(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (_token == KEY_WORD_XOR) {
@@ -393,8 +401,11 @@ bool _expression_aux(_ast *_past) {
       result = true;
     }
   } else if (_token == KEY_WORD_OR) {
+    *_past = _ast_create_operation_node(OPERATION_OR, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_relation(_past)) {
+    if (_relation(_right)) {
+      (*_past)->value.operation.right = *_right;
       result = true;
     }
   } else if (
@@ -423,6 +434,7 @@ bool _relation_aux(_ast *_past) {
   if (DEBUG_MODE == true) printf("_relation_aux() : %s\n", yytext);
   bool result = false;
   if (_token == DELIMITER_EQUAL) {
+    *_past = _ast_create_operation_node(OPERATION_EQUAL, *_past, NULL);
     _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
     if (_simple_expression(_right)) {
@@ -592,10 +604,13 @@ bool _term_aux(_ast *_past) {
       }
     }
   } else if (_token == KEY_WORD_MOD) {
+    *_past = _ast_create_operation_node(OPERATION_MOD, *_past, NULL);
+    _ast *_right = (_ast *) malloc(sizeof(_ast));
     _read_token();
-    if (_factor(_past)) {
+    if (_factor(_right)) {
       _read_token();
-      if (_term_aux(_past)) {
+      if (_term_aux(_right)) {
+        (*_past)->value.operation.right = *_right;
         result = true;
       }
     }

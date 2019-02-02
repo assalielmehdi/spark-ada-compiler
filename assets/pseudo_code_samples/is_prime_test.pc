@@ -1,4 +1,4 @@
-DATA n 7
+DATA n 1
 DATA i 2
 DATA result 1
 begin:
@@ -12,8 +12,6 @@ LOAD result
 PUSH 1
 EVAL_E
 MULT
-PUSH 1
-EVAL_E
 JF end_0:
 LOAD n
 LOAD i

@@ -64,6 +64,15 @@ void _ast_print_operation(_operation_type type) {
     case OPERATION_PLUS:
       printf("+ ");
       break;
+    case OPERATION_MOD:
+      printf("%% ");
+      break;
+    case OPERATION_AND:
+      printf("and ");
+      break;
+    case OPERATION_OR:
+      printf("or ");
+      break;
   }
 }
 
